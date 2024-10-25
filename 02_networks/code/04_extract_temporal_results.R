@@ -86,94 +86,145 @@ unique(mlvarfit$parameters$wilevel.standardized$stdyx.standardized$cluster)
 
 
 # ---------------------------------------------------------------------------- #
-# 1. Compute network parameters from 8-node VAR model ----
+# Define parameter numbers for temporal results for VAR models ----
 # ---------------------------------------------------------------------------- #
 
-# Extract standardized autoregressive and cross-lagged temporal model coefficients 
-# (parameters 1-64, whereas parameters 65-92 are contemporaneous relations, parameters 
-# 93-100 are intercepts, and parameters 101-108 are residual variances)
+# Manually define parameter numbers in fit object for standardized autoregressive 
+# and cross-lagged model coefficients
 
-  # TODO: Ideally extract rows and columns by name below
+  # For 8-node VAR model (parameters 1-64, whereas 65-92 are contemporaneous effects, 
+  # 93-100 are intercepts, and 101-108 are residual variances)
 
-parameters <- paste0("par", 1:64)
+# View(varfit[[1]]$parameters$stdyx.standardized) # Example participant
+param_numbers_var <- 1:64
 
-results <- lapply(varfit, function(x) {
-  out <- cbind(parameters,
-               x$parameters$stdyx.standardized[c(1:64),     # TODO: Rows where "paramHeader" contains ".ON"
-                                               c("paramHeader", "param", "est", "lower_2.5ci", "upper_2.5ci")])
+  # For 7-node VAR model with "control" (parameters 1-49, whereas 50-70 are contemporaneous 
+  # effects, 71-77 are intercepts, and 78-84 are residual variances)
+
+# View(varfit_control[[1]]$parameters$stdyx.standardized) # Example participant
+param_numbers_var_control <- 1:49
+
+  # For 7-node VAR model with "fun" (same as for 7-node VAR model with "control")
+
+# View(varfit_fun[[1]]$parameters$stdyx.standardized) # Example participant
+param_numbers_var_fun <- 1:49
+
+# ---------------------------------------------------------------------------- #
+# Extract and threshold temporal results for VAR models ----
+# ---------------------------------------------------------------------------- #
+
+# Define function to extract and threshold standardized temporal results
+
+extract_temporal_results <- function(fit, param_numbers) {
+  # Extract standardized autoregressive and cross-lagged model coefficients
   
-  return(out)
-})
-
-# Add "lifepak_id" column to each data frame in list
-
-for (i in 1:length(results)) {
-  results[[i]]$lifepak_id <- names(results[i])
+  results <- lapply(fit, function(x) {
+    out <- cbind(param_numbers,
+                 x$parameters$stdyx.standardized[param_numbers,
+                                                 c("paramHeader", "param", 
+                                                   "est", "lower_2.5ci", "upper_2.5ci")])
+    
+    names(out)[names(out) == "param_numbers"] <- "param_number"
+    
+    return(out)
+  })
   
-  results[[i]] <- results[[i]][, c("lifepak_id", names(results[[i]])[names(results[[i]]) != "lifepak_id"])]
+  # Add "lifepak_id" column to each data frame in list
+  
+  for (i in 1:length(results)) {
+    results[[i]]$lifepak_id <- names(results[i])
+    
+    results[[i]] <- results[[i]][, c("lifepak_id", names(results[[i]])[names(results[[i]]) != "lifepak_id"])]
+  }
+  
+  # Stack results for all participants in one data frame
+  
+  results <- do.call(rbind, results)
+  
+  # Create columns for criterion and predictor variable names (based on all 8
+  # possible nodes; in 7-node networks, only 7 of the 8 lines below will apply)
+  
+  results$criterion <- NA
+  results$criterion[results$paramHeader == "BAD.ON"]  <- "bad"
+  results$criterion[results$paramHeader == "CONT.ON"] <- "control"
+  results$criterion[results$paramHeader == "ENER.ON"] <- "energy"
+  results$criterion[results$paramHeader == "FOC.ON"]  <- "focus"
+  results$criterion[results$paramHeader == "FUN.ON"]  <- "fun"
+  results$criterion[results$paramHeader == "INT.ON"]  <- "interest"
+  results$criterion[results$paramHeader == "MOVE.ON"] <- "movement"
+  results$criterion[results$paramHeader == "SAD.ON"]  <- "sad"
+  
+  results$predictor <- NA
+  results$predictor[results$param == "BAD&1"]  <- "bad"
+  results$predictor[results$param == "CONT&1"] <- "control"
+  results$predictor[results$param == "ENER&1"] <- "energy"
+  results$predictor[results$param == "FOC&1"]  <- "focus"
+  results$predictor[results$param == "FUN&1"]  <- "fun"
+  results$predictor[results$param == "INT&1"]  <- "interest"
+  results$predictor[results$param == "MOVE&1"] <- "movement"
+  results$predictor[results$param == "SAD&1"]  <- "sad"
+  
+  # Threshold edges based on significance
+  
+  results$est_thres <- NA
+  
+  results$est_thres <- ifelse((results$lower_2.5ci > 0 & results$upper_2.5ci > 0) |
+                                (results$lower_2.5ci < 0 & results$upper_2.5ci < 0), results$est, 0)
+  
+  return(results)
 }
 
-# Stack results for all participants in one data frame
+# Run function
 
-results <- do.call(rbind, results)
+results_var         <- extract_temporal_results(varfit,         param_numbers_var)
+results_var_control <- extract_temporal_results(varfit_control, param_numbers_var_control)
+results_var_fun     <- extract_temporal_results(varfit_fun,     param_numbers_var_fun)
 
-# Create columns with criterion and predictor variable names
-
-results$criterion <- NA
-results$criterion[results$paramHeader == "BAD.ON"]  <- "bad"
-results$criterion[results$paramHeader == "CONT.ON"] <- "control"
-results$criterion[results$paramHeader == "ENER.ON"] <- "energy"
-results$criterion[results$paramHeader == "FOC.ON"]  <- "focus"
-results$criterion[results$paramHeader == "FUN.ON"]  <- "fun"
-results$criterion[results$paramHeader == "INT.ON"]  <- "interest"
-results$criterion[results$paramHeader == "MOVE.ON"] <- "movement"
-results$criterion[results$paramHeader == "SAD.ON"]  <- "sad"
-
-results$predictor <- NA
-results$predictor[results$param == "BAD&1"]  <- "bad"
-results$predictor[results$param == "CONT&1"] <- "control"
-results$predictor[results$param == "ENER&1"] <- "energy"
-results$predictor[results$param == "FOC&1"]  <- "focus"
-results$predictor[results$param == "FUN&1"]  <- "fun"
-results$predictor[results$param == "INT&1"]  <- "interest"
-results$predictor[results$param == "MOVE&1"] <- "movement"
-results$predictor[results$param == "SAD&1"]  <- "sad"
-
-# Threshold edges based on significance
-
-results$est_thres <- NA
-
-results$est_thres <- ifelse((results$lower_2.5ci > 0 & results$upper_2.5ci > 0) |
-                              (results$lower_2.5ci < 0 & results$upper_2.5ci < 0), results$est, 0)
+# ---------------------------------------------------------------------------- #
+# Create thresholded adjacency matrices for VAR models ----
+# ---------------------------------------------------------------------------- #
 
 # Define function to create directed adjacency matrix of thresholded autoregressive 
-# and cross-lagged coefficients for a given participant, where rows are predictors
+# and cross-lagged coefficients for a given participant (where rows are predictors
 # and columns are criterions)
 
-create_thres_adjacency_matrix <- function(participant_data) {
-  variables <- unique(c(participant_data$criterion, participant_data$predictor))
-  adj_matrix <- matrix(NA, nrow = length(variables), ncol = length(variables))
-  rownames(adj_matrix) <- variables
-  colnames(adj_matrix) <- variables
-  for (i in 1:nrow(participant_data)) {
-    predictor <- participant_data$predictor[i]
-    criterion <- participant_data$criterion[i]
-    relationship <- participant_data$est_thres[i]
-    adj_matrix[predictor, criterion] <- relationship
+create_thres_adj_mat <- function(participant_results) {
+  variables <- unique(c(participant_results$criterion, participant_results$predictor))
+  adj_mat <- matrix(NA, nrow = length(variables), ncol = length(variables))
+  rownames(adj_mat) <- variables
+  colnames(adj_mat) <- variables
+  for (i in 1:nrow(participant_results)) {
+    predictor <- participant_results$predictor[i]
+    criterion <- participant_results$criterion[i]
+    relationship <- participant_results$est_thres[i]
+    adj_mat[predictor, criterion] <- relationship
   }
-  return(adj_matrix)
+  
+  return(adj_mat)
 }
 
-# Group data by participant (using "lifepak_id" as factor to preserve order) and 
-# create adjacency matrices
+# Define function to group results by participant and create adjacency matrices
 
-results$lifepak_id_fct <- factor(results$lifepak_id, levels = unique(results$lifepak_id))
+create_thres_adj_mats <- function(results) {
+  # Note: Use factor version of "lifepak_id" to preserve participant order
+  
+  results$lifepak_id_fct <- factor(results$lifepak_id, levels = unique(results$lifepak_id))
+  
+  thres_adj_mats <- results %>%
+    split(.$lifepak_id_fct) %>%
+    lapply(create_thres_adj_mat)
+  
+  return(thres_adj_mats)
+}
 
-thres_adjacency_matrices <- results %>%
-  split(.$lifepak_id_fct) %>%
-  lapply(create_thres_adjacency_matrix)
+# Run function to create adjacency matrices
 
-results$lifepak_id_fct <- NULL
+thres_adj_mats_var         <- create_thres_adj_mats(results_var)
+thres_adj_mats_var_control <- create_thres_adj_mats(results_var_control)
+thres_adj_mats_var_fun     <- create_thres_adj_mats(results_var_fun)
+
+
+
 
 # TODO: Separate extraction of model coefficients and creation of adjacency
 # matrices from computation of network parameters. Also, condense code using
@@ -182,155 +233,6 @@ results$lifepak_id_fct <- NULL
 
 
 
-
-# ---------------------------------------------------------------------------- #
-# Computing the person-specific parameters in a 7-node VAR network with control ----
-# ---------------------------------------------------------------------------- #
-
-#extracting the relevant parameters
-parameters_control <- paste0("par", 1:49)
-results_control <- lapply(varfit_control, function(x) {
-  out <- cbind(parameters_control, 
-               x$parameters$stdyx.standardized[c(1:49),
-                                               c(3, 6, 7)])
-  
-  return(out)
-})
-
-results_control <- do.call(rbind, results_control)
-
-# ---------------------------------------------------------------------------- #
-# Computing the parameters in a 7-node VAR network with control ----
-# ---------------------------------------------------------------------------- #
-
-#create a column in the dataframe that signifies to which participant do the given set of coefficients belong. 
-# Calculate the number of participants
-num_participants <- ceiling(nrow(results_control) / 49)
-
-# Create the participant labels
-participant_labels <- rep(paste0("Participant ", 1:num_participants), each = 49, length.out = nrow(results_control))
-
-results_control$Participant <- participant_labels
-
-results_control <- results_control[, c("Participant", "parameters_control", "est", "lower_2.5ci", "upper_2.5ci")]
-
-#create the column with criterion variable names
-
-variables_control <- c("bad", "control", "energy", "focus", "interest", "movement", "sad")
-
-repeated_variables <- rep(rep(variables_control, each = 7), length.out = nrow(results_control))
-
-results_control$criterion <- repeated_variables
-
-#create the column with predictor variable names
-repeated_predictor_variables <- rep(variables_control, length.out = nrow(results_control))
-
-results_control$predictor <- repeated_predictor_variables
-
-#replacing non-significant edges with zeroes
-
-results_control$est <- ifelse((results_control$lower_2.5ci > 0 & results_control$upper_2.5ci > 0) |
-                                (results_control$lower_2.5ci < 0 & results_control$upper_2.5ci < 0), results_control$est, 0)
-
-#create an adjacency matrix of auto-regressive and cross-regressive coefficients
-#create a directed adjacency matrix for each participant
-
-# Function to create adjacency matrix for a given participant's data
-create_adjacency_matrix <- function(participant_data) {
-  variables_control <- unique(c(participant_data$criterion, participant_data$predictor))
-  adj_matrix <- matrix(NA, nrow = length(variables_control), ncol = length(variables_control))
-  rownames(adj_matrix) <- variables_control
-  colnames(adj_matrix) <- variables_control
-  for (i in 1:nrow(participant_data)) {
-    predictor <- participant_data$predictor[i]
-    criterion <- participant_data$criterion[i]
-    relationship <- participant_data$est[i]
-    adj_matrix[predictor, criterion] <- relationship
-  }
-  return(adj_matrix)
-}
-
-# Group data by participant and create adjacency matrices
-adjacency_matrices_control <- results_control %>%
-  group_by(Participant) %>%
-  group_split() %>%
-  lapply(create_adjacency_matrix)
-
-# Naming the list elements by Participant IDs 
-names(adjacency_matrices_control) <- unique(results_control$Participant)
-
-# ---------------------------------------------------------------------------- #
-# Computing the parameters in a 7-node VAR network with fun ----
-# ---------------------------------------------------------------------------- #
-
-#extracting the relevant parameters
-parameters_fun <- paste0("par", 1:49)
-results_fun <- lapply(varfit_fun, function(x) {
-  out <- cbind(parameters_fun, 
-               x$parameters$stdyx.standardized[c(1:49),
-                                               c(3, 6, 7)])
-  
-  return(out)
-})
-
-results_fun <- do.call(rbind, results_fun)
-rm(parameters_fun)
-
-#create a column in the dataframe that signifies to which participant do the given set of coefficients belong. 
-# Calculate the number of participants
-num_participants <- ceiling(nrow(results_fun) / 49)
-
-#create participant labels
-participant_labels <- rep(paste0("Participant ", 1:num_participants), each = 49, length.out = nrow(results_fun))
-
-results_fun$Participant <- participant_labels
-
-results_fun <- results_fun[, c("Participant", "parameters_fun", "est", "lower_2.5ci", "upper_2.5ci")]
-
-#create the column with criterion variable names
-
-variables_fun <- c("bad", "energy", "focus", "fun", "interest", "movement", "sad")
-
-repeated_variables <- rep(rep(variables_fun, each = 7), length.out = nrow(results_fun))
-
-results_fun$criterion <- repeated_variables
-
-#create the column with predictor variable names
-repeated_predictor_variables <- rep(variables_fun, length.out = nrow(results_fun))
-
-results_fun$predictor <- repeated_predictor_variables
-
-#replacing non-significant edges with zeroes
-
-results_fun$est <- ifelse((results_fun$lower_2.5ci > 0 & results_fun$upper_2.5ci > 0) |
-                            (results_fun$lower_2.5ci < 0 & results_fun$upper_2.5ci < 0), results_fun$est, 0)
-
-#create an adjacency matrix of auto-regressive and cross-regressive coefficients
-#create a directed adjacency matrix for each participant
-
-# function to create adjacency matrix for a given participant's data
-create_adjacency_matrix <- function(participant_data) {
-  variables_fun <- unique(c(participant_data$criterion, participant_data$predictor))
-  adj_matrix <- matrix(NA, nrow = length(variables_fun), ncol = length(variables_fun))
-  rownames(adj_matrix) <- variables_fun
-  colnames(adj_matrix) <- variables_fun
-  for (i in 1:nrow(participant_data)) {
-    predictor <- participant_data$predictor[i]
-    criterion <- participant_data$criterion[i]
-    relationship <- participant_data$est[i]
-    adj_matrix[predictor, criterion] <- relationship
-  }
-  return(adj_matrix)
-}
-
-# Group data by participant and create adjacency matrices
-adjacency_matrices_fun <- results_fun %>%
-  group_by(Participant) %>%
-  group_split() %>%
-  lapply(create_adjacency_matrix)
-
-# Naming the list elements by Participant IDs 
-names(adjacency_matrices_fun) <- unique(results_fun$Participant)
 
 # ---------------------------------------------------------------------------- #
 # Extracting the person-specific parameters from the 8-node ML-VAR network ----
