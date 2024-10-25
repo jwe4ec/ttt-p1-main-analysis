@@ -36,13 +36,13 @@ groundhog.library(pkgs, groundhog_day)
 # Import results ----
 # ---------------------------------------------------------------------------- #
 
-varfit           <- readRDS(file="./02_networks/results/varfit.RDS")
-varfit_control   <- readRDS(file="./02_networks/results/varfit_control.RDS")
-varfit_fun       <- readRDS(file="./02_networks/results/varfit_fun.RDS")
+varfit           <- readRDS(file = "./02_networks/results/varfit.RDS")
+varfit_control   <- readRDS(file = "./02_networks/results/varfit_control.RDS")
+varfit_fun       <- readRDS(file = "./02_networks/results/varfit_fun.RDS")
 
-mlvarfit         <- readRDS(file="./02_networks/results/mlvarfit.RDS")
-mlvarfit_control <- readRDS(file="./02_networks/results/mlvarfit_control.RDS")
-mlvarfit_fun     <- readRDS(file="./02_networks/results/mlvarfit_fun.RDS")
+mlvarfit         <- readRDS(file = "./02_networks/results/mlvarfit.RDS")
+mlvarfit_control <- readRDS(file = "./02_networks/results/mlvarfit_control.RDS")
+mlvarfit_fun     <- readRDS(file = "./02_networks/results/mlvarfit_fun.RDS")
 
 # Load Lifepak IDs
 
@@ -100,7 +100,7 @@ parameters <- paste0("par", 1:64)
 results <- lapply(varfit, function(x) {
   out <- cbind(parameters,
                x$parameters$stdyx.standardized[c(1:64),     # TODO: Rows where "paramHeader" contains ".ON"
-                                               c("est", "lower_2.5ci", "upper_2.5ci")])
+                                               c("paramHeader", "param", "est", "lower_2.5ci", "upper_2.5ci")])
   
   return(out)
 })
@@ -117,30 +117,40 @@ for (i in 1:length(results)) {
 
 results <- do.call(rbind, results)
 
-# TODO (avoid hard-coding with order of names): Create column with criterion variable names
+# Create columns with criterion and predictor variable names
 
-variables <- c("bad", "control", "energy", "focus", "fun", "interest", "movement", "sad")
+results$criterion <- NA
+results$criterion[results$paramHeader == "BAD.ON"]  <- "bad"
+results$criterion[results$paramHeader == "CONT.ON"] <- "control"
+results$criterion[results$paramHeader == "ENER.ON"] <- "energy"
+results$criterion[results$paramHeader == "FOC.ON"]  <- "focus"
+results$criterion[results$paramHeader == "FUN.ON"]  <- "fun"
+results$criterion[results$paramHeader == "INT.ON"]  <- "interest"
+results$criterion[results$paramHeader == "MOVE.ON"] <- "movement"
+results$criterion[results$paramHeader == "SAD.ON"]  <- "sad"
 
-repeated_variables <- rep(rep(variables, each = 8), length.out = nrow(results))
+results$predictor <- NA
+results$predictor[results$param == "BAD&1"]  <- "bad"
+results$predictor[results$param == "CONT&1"] <- "control"
+results$predictor[results$param == "ENER&1"] <- "energy"
+results$predictor[results$param == "FOC&1"]  <- "focus"
+results$predictor[results$param == "FUN&1"]  <- "fun"
+results$predictor[results$param == "INT&1"]  <- "interest"
+results$predictor[results$param == "MOVE&1"] <- "movement"
+results$predictor[results$param == "SAD&1"]  <- "sad"
 
-results$criterion <- repeated_variables
+# Threshold edges based on significance
 
-# Create column with predictor variable names
+results$est_thres <- NA
 
-repeated_predictor_variables <- rep(variables, length.out = nrow(results))
+results$est_thres <- ifelse((results$lower_2.5ci > 0 & results$upper_2.5ci > 0) |
+                              (results$lower_2.5ci < 0 & results$upper_2.5ci < 0), results$est, 0)
 
-results$predictor <- repeated_predictor_variables
+# Define function to create directed adjacency matrix of thresholded autoregressive 
+# and cross-lagged coefficients for a given participant, where rows are predictors
+# and columns are criterions)
 
-# Replace nonsignificant edges with zeroes
-
-results$est <- ifelse((results$lower_2.5ci > 0 & results$upper_2.5ci > 0) |
-                        (results$lower_2.5ci < 0 & results$upper_2.5ci < 0), results$est, 0)
-
-# Define function to create directed adjacency matrix of autoregressive and 
-# cross-lagged coefficients for a given participant, where each row is the 
-# predictor and each column is the criterion)
-
-create_adjacency_matrix <- function(participant_data) {
+create_thres_adjacency_matrix <- function(participant_data) {
   variables <- unique(c(participant_data$criterion, participant_data$predictor))
   adj_matrix <- matrix(NA, nrow = length(variables), ncol = length(variables))
   rownames(adj_matrix) <- variables
@@ -148,7 +158,7 @@ create_adjacency_matrix <- function(participant_data) {
   for (i in 1:nrow(participant_data)) {
     predictor <- participant_data$predictor[i]
     criterion <- participant_data$criterion[i]
-    relationship <- participant_data$est[i]
+    relationship <- participant_data$est_thres[i]
     adj_matrix[predictor, criterion] <- relationship
   }
   return(adj_matrix)
@@ -159,9 +169,9 @@ create_adjacency_matrix <- function(participant_data) {
 
 results$lifepak_id_fct <- factor(results$lifepak_id, levels = unique(results$lifepak_id))
 
-adjacency_matrices <- results %>%
+thres_adjacency_matrices <- results %>%
   split(.$lifepak_id_fct) %>%
-  lapply(create_adjacency_matrix)
+  lapply(create_thres_adjacency_matrix)
 
 results$lifepak_id_fct <- NULL
 
@@ -490,7 +500,7 @@ parameters_mlvar_solution_fun <- mlvarfit_fun$parameters$wilevel.standardized$st
 # Creating the adjacency matrix from ML-VAR parameters for the 7-node network with fun ----
 # ---------------------------------------------------------------------------- #
 
-mlvarfit_fun <- readRDS(file="./02_networks/results/mlvarfit_fun.RDS")
+mlvarfit_fun <- readRDS(file = "./02_networks/results/mlvarfit_fun.RDS")
 
 results_mlvar_fun <- parameters_mlvar_solution_fun
 
