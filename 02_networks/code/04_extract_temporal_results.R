@@ -89,40 +89,33 @@ unique(mlvarfit$parameters$wilevel.standardized$stdyx.standardized$cluster)
 # 1. Compute network parameters from 8-node VAR model ----
 # ---------------------------------------------------------------------------- #
 
-# Extract autoregressive and cross-lagged temporal model coefficients (parameters 
-# 1-64, whereas parameters 65-92 are contemporaneous relations, parameters 93-100
-# are intercepts, and parameters 101-108 are residual variances)
+# Extract standardized autoregressive and cross-lagged temporal model coefficients 
+# (parameters 1-64, whereas parameters 65-92 are contemporaneous relations, parameters 
+# 93-100 are intercepts, and parameters 101-108 are residual variances)
 
   # TODO: Ideally extract rows and columns by name below
 
 parameters <- paste0("par", 1:64)
+
 results <- lapply(varfit, function(x) {
-  out <- cbind(parameters, 
+  out <- cbind(parameters,
                x$parameters$stdyx.standardized[c(1:64),     # TODO: Rows where "paramHeader" contains ".ON"
                                                c("est", "lower_2.5ci", "upper_2.5ci")])
   
   return(out)
 })
 
+# Add "lifepak_id" to each data frame in list
+
+for (i in 1:length(results)) {
+  results[[i]]$lifepak_id <- names(results[i])
+  
+  results[[i]] <- results[[i]][, c("lifepak_id", names(results[[i]])[names(results[[i]]) != "lifepak_id"])]
+}
+
 # Stack results for all participants in one data frame
 
 results <- do.call(rbind, results)
-
-# Create a column that signifies to which participant each set of coefficients belongs
-
-  # TODO: Avoid hard-coding with 64
-
-num_participants <- nrow(results) / 64
-
-  # TODO: Label "varfit" list by participant ID and then use that to add participant IDs here instead
-  # (and change column name to lowercase)
-
-participant_labels <- rep(paste0("Participant ", 1:num_participants), each = 64,
-                          length.out = nrow(results))
-
-results$Participant <- participant_labels
-
-results <- results[, c("Participant", "parameters", "est", "lower_2.5ci", "upper_2.5ci")]
 
 # TODO (avoid hard-coding with order of names): Create column with criterion variable names
 
@@ -161,31 +154,16 @@ create_adjacency_matrix <- function(participant_data) {
   return(adj_matrix)
 }
 
-# Group data by participant and create adjacency matrices
+# Group data by participant (using "lifepak_id" as factor to preserve order) and 
+# create adjacency matrices
 
-  # TODO: Have to convert Participant to factor to preserve order. Otherwise,
-  # group_split() will sort Participant alphabetically (e.g., "Participant 1",
-  # then "Participant 10"). But use actual participant IDs instead of this.
-
-results$Participant <- factor(results$Participant, levels = unique(results$Participant))
+results$lifepak_id_fct <- factor(results$lifepak_id, levels = unique(results$lifepak_id))
 
 adjacency_matrices <- results %>%
-  group_by(Participant) %>%
-  group_split() %>%
+  split(.$lifepak_id_fct) %>%
   lapply(create_adjacency_matrix)
 
-# Name list elements by Participant IDs
-
-names(adjacency_matrices) <- unique(results$Participant)
-
-# TODO: If Participant is not converted to factor in Line, 129 above, results will
-# match for first element but not for others
-
-adjacency_matrices[[1]]
-View(varfit[[1]]$parameters$stdyx.standardized)
-
-adjacency_matrices[[3]]
-View(varfit[[3]]$parameters$stdyx.standardized)
+results$lifepak_id_fct <- NULL
 
 # TODO: Separate extraction of model coefficients and creation of adjacency
 # matrices from computation of network parameters. Also, condense code using
