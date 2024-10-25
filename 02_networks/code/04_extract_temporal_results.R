@@ -105,7 +105,7 @@ results <- lapply(varfit, function(x) {
   return(out)
 })
 
-# Add "lifepak_id" to each data frame in list
+# Add "lifepak_id" column to each data frame in list
 
 for (i in 1:length(results)) {
   results[[i]]$lifepak_id <- names(results[i])
@@ -123,13 +123,13 @@ variables <- c("bad", "control", "energy", "focus", "fun", "interest", "movement
 
 repeated_variables <- rep(rep(variables, each = 8), length.out = nrow(results))
 
-results$Criterion <- repeated_variables # TODO: Change column name to lowercase
+results$criterion <- repeated_variables
 
 # Create column with predictor variable names
 
 repeated_predictor_variables <- rep(variables, length.out = nrow(results))
 
-results$Predictor <- repeated_predictor_variables # TODO: Change column name to lowercase
+results$predictor <- repeated_predictor_variables
 
 # Replace nonsignificant edges with zeroes
 
@@ -141,13 +141,13 @@ results$est <- ifelse((results$lower_2.5ci > 0 & results$upper_2.5ci > 0) |
 # predictor and each column is the criterion)
 
 create_adjacency_matrix <- function(participant_data) {
-  variables <- unique(c(participant_data$Criterion, participant_data$Predictor))
-  adj_matrix <- matrix(NA, nrow = length(variables), ncol = length(variables)) # TODO: Initialized with NA instead of 0
+  variables <- unique(c(participant_data$criterion, participant_data$predictor))
+  adj_matrix <- matrix(NA, nrow = length(variables), ncol = length(variables))
   rownames(adj_matrix) <- variables
   colnames(adj_matrix) <- variables
   for (i in 1:nrow(participant_data)) {
-    predictor <- participant_data$Predictor[i]
-    criterion <- participant_data$Criterion[i]
+    predictor <- participant_data$predictor[i]
+    criterion <- participant_data$criterion[i]
     relationship <- participant_data$est[i]
     adj_matrix[predictor, criterion] <- relationship
   }
@@ -210,12 +210,12 @@ variables_control <- c("bad", "control", "energy", "focus", "interest", "movemen
 
 repeated_variables <- rep(rep(variables_control, each = 7), length.out = nrow(results_control))
 
-results_control$Criterion <- repeated_variables
+results_control$criterion <- repeated_variables
 
 #create the column with predictor variable names
 repeated_predictor_variables <- rep(variables_control, length.out = nrow(results_control))
 
-results_control$Predictor <- repeated_predictor_variables
+results_control$predictor <- repeated_predictor_variables
 
 #replacing non-significant edges with zeroes
 
@@ -227,13 +227,13 @@ results_control$est <- ifelse((results_control$lower_2.5ci > 0 & results_control
 
 # Function to create adjacency matrix for a given participant's data
 create_adjacency_matrix <- function(participant_data) {
-  variables_control <- unique(c(participant_data$Criterion, participant_data$Predictor))
-  adj_matrix <- matrix(0, nrow = length(variables_control), ncol = length(variables_control))
+  variables_control <- unique(c(participant_data$criterion, participant_data$predictor))
+  adj_matrix <- matrix(NA, nrow = length(variables_control), ncol = length(variables_control))
   rownames(adj_matrix) <- variables_control
   colnames(adj_matrix) <- variables_control
   for (i in 1:nrow(participant_data)) {
-    predictor <- participant_data$Predictor[i]
-    criterion <- participant_data$Criterion[i]
+    predictor <- participant_data$predictor[i]
+    criterion <- participant_data$criterion[i]
     relationship <- participant_data$est[i]
     adj_matrix[predictor, criterion] <- relationship
   }
@@ -283,12 +283,12 @@ variables_fun <- c("bad", "energy", "focus", "fun", "interest", "movement", "sad
 
 repeated_variables <- rep(rep(variables_fun, each = 7), length.out = nrow(results_fun))
 
-results_fun$Criterion <- repeated_variables
+results_fun$criterion <- repeated_variables
 
 #create the column with predictor variable names
 repeated_predictor_variables <- rep(variables_fun, length.out = nrow(results_fun))
 
-results_fun$Predictor <- repeated_predictor_variables
+results_fun$predictor <- repeated_predictor_variables
 
 #replacing non-significant edges with zeroes
 
@@ -300,13 +300,13 @@ results_fun$est <- ifelse((results_fun$lower_2.5ci > 0 & results_fun$upper_2.5ci
 
 # function to create adjacency matrix for a given participant's data
 create_adjacency_matrix <- function(participant_data) {
-  variables_fun <- unique(c(participant_data$Criterion, participant_data$Predictor))
-  adj_matrix <- matrix(0, nrow = length(variables_fun), ncol = length(variables_fun))
+  variables_fun <- unique(c(participant_data$criterion, participant_data$predictor))
+  adj_matrix <- matrix(NA, nrow = length(variables_fun), ncol = length(variables_fun))
   rownames(adj_matrix) <- variables_fun
   colnames(adj_matrix) <- variables_fun
   for (i in 1:nrow(participant_data)) {
-    predictor <- participant_data$Predictor[i]
-    criterion <- participant_data$Criterion[i]
+    predictor <- participant_data$predictor[i]
+    criterion <- participant_data$criterion[i]
     relationship <- participant_data$est[i]
     adj_matrix[predictor, criterion] <- relationship
   }
@@ -358,12 +358,12 @@ variables <- c("bad", "control", "energy", "focus", "fun", "interest", "movement
 
 repeated_variables <- rep(rep(variables, each = 8), length.out = nrow(results_mlvar))
 
-results_mlvar$Criterion <- repeated_variables
+results_mlvar$criterion <- repeated_variables
 
 #create the column with predictor variable names
 repeated_predictor_variables <- rep(variables, length.out = nrow(results_mlvar))
 
-results_mlvar$Predictor <- repeated_predictor_variables
+results_mlvar$predictor <- repeated_predictor_variables
 
 #replacing non-significant edges with zeroes
 
@@ -375,13 +375,13 @@ results_mlvar$est <- ifelse((results_mlvar$lower_2.5ci > 0 & results_mlvar$upper
 
 # function to create adjacency matrix for a given participant's data
 create_adjacency_matrix <- function(participant_data) {
-  variables <- unique(c(participant_data$Criterion, participant_data$Predictor))
-  adj_matrix <- matrix(0, nrow = length(variables), ncol = length(variables))
+  variables <- unique(c(participant_data$criterion, participant_data$predictor))
+  adj_matrix <- matrix(NA, nrow = length(variables), ncol = length(variables))
   rownames(adj_matrix) <- variables
   colnames(adj_matrix) <- variables
   for (i in 1:nrow(participant_data)) {
-    predictor <- participant_data$Predictor[i]
-    criterion <- participant_data$Criterion[i]
+    predictor <- participant_data$predictor[i]
+    criterion <- participant_data$criterion[i]
     relationship <- participant_data$est[i]
     adj_matrix[predictor, criterion] <- relationship
   }
@@ -433,12 +433,12 @@ variables <- c("bad", "control", "energy", "focus", "interest", "movement", "sad
 
 repeated_variables <- rep(rep(variables, each = 7), length.out = nrow(results_mlvar_control))
 
-results_mlvar_control$Criterion <- repeated_variables
+results_mlvar_control$criterion <- repeated_variables
 
 #create the column with predictor variable names
 repeated_predictor_variables <- rep(variables, length.out = nrow(results_mlvar_control))
 
-results_mlvar_control$Predictor <- repeated_predictor_variables
+results_mlvar_control$predictor <- repeated_predictor_variables
 
 #replacing non-significant edges with zeroes
 
@@ -454,13 +454,13 @@ results_mlvar_control$est <- ifelse((results_mlvar_control$lower_2.5ci > 0 & res
 
 # Function to create adjacency matrix for a given participant's data
 create_adjacency_matrix <- function(participant_data) {
-  variables_mlvar_control <- unique(c(participant_data$Criterion, participant_data$Predictor))
-  adj_matrix <- matrix(0, nrow = length(variables_mlvar_control), ncol = length(variables_mlvar_control))
+  variables_mlvar_control <- unique(c(participant_data$criterion, participant_data$predictor))
+  adj_matrix <- matrix(NA, nrow = length(variables_mlvar_control), ncol = length(variables_mlvar_control))
   rownames(adj_matrix) <- variables_mlvar_control
   colnames(adj_matrix) <- variables_mlvar_control
   for (i in 1:nrow(participant_data)) {
-    predictor <- participant_data$Predictor[i]
-    criterion <- participant_data$Criterion[i]
+    predictor <- participant_data$predictor[i]
+    criterion <- participant_data$criterion[i]
     relationship <- participant_data$est[i]
     adj_matrix[predictor, criterion] <- relationship
   }
@@ -518,12 +518,12 @@ variables <- c("bad", "energy", "focus", "fun", "interest", "movement", "sad")
 
 repeated_variables <- rep(rep(variables, each = 7), length.out = nrow(results_mlvar_fun))
 
-results_mlvar_fun$Criterion <- repeated_variables
+results_mlvar_fun$criterion <- repeated_variables
 
 #create the column with predictor variable names
 repeated_predictor_variables <- rep(variables, length.out = nrow(results_mlvar_fun))
 
-results_mlvar_fun$Predictor <- repeated_predictor_variables
+results_mlvar_fun$predictor <- repeated_predictor_variables
 
 #replacing non-significant edges with zeroes
 
@@ -539,13 +539,13 @@ results_mlvar_fun$est <- ifelse((results_mlvar_fun$lower_2.5ci > 0 & results_mlv
 
 # Function to create adjacency matrix for a given participant's data
 create_adjacency_matrix <- function(participant_data) {
-  variables_mlvar_fun <- unique(c(participant_data$Criterion, participant_data$Predictor))
-  adj_matrix <- matrix(0, nrow = length(variables_mlvar_fun), ncol = length(variables_mlvar_fun))
+  variables_mlvar_fun <- unique(c(participant_data$criterion, participant_data$predictor))
+  adj_matrix <- matrix(NA, nrow = length(variables_mlvar_fun), ncol = length(variables_mlvar_fun))
   rownames(adj_matrix) <- variables_mlvar_fun
   colnames(adj_matrix) <- variables_mlvar_fun
   for (i in 1:nrow(participant_data)) {
-    predictor <- participant_data$Predictor[i]
-    criterion <- participant_data$Criterion[i]
+    predictor <- participant_data$predictor[i]
+    criterion <- participant_data$criterion[i]
     relationship <- participant_data$est[i]
     adj_matrix[predictor, criterion] <- relationship
   }
