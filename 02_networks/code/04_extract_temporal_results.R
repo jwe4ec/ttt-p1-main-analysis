@@ -26,11 +26,9 @@ source("./02_networks/code/01_define_functions.R")
 
 groundhog_day <- version_control()
 
-# Load packages
+# Load package
 
-pkgs <- c("dplyr", "tidyr", "Hmisc", "networktools", "netcontrol") # TODO: Determine what packages are needed
-
-groundhog.library(pkgs, groundhog_day)
+groundhog.library("dplyr", groundhog_day)
 
 # ---------------------------------------------------------------------------- #
 # Import results ----
@@ -71,20 +69,16 @@ varfit_control <- name_var_fit_elements(varfit_control, ids)
 varfit_fun     <- name_var_fit_elements(varfit_fun,     ids)
 
 # ---------------------------------------------------------------------------- #
-# TODO: Check that ML-VAR clusters correspond to Lifepak IDs ----
+# Check that ML-VAR clusters are Lifepak IDs ----
 # ---------------------------------------------------------------------------- #
 
-# TODO: Although all ML-VAR clusters reflect Lifepak IDs, the order differs
+# All clusters are Lifepak IDs but in a different order (will reorder later in script)
 
 length(intersect(ids, unique(mlvarfit$parameters$wilevel.standardized$stdyx.standardized$cluster))) == length(ids)
 
 ids
 unique(mlvarfit$parameters$wilevel.standardized$stdyx.standardized$cluster)
 
-
-
-
-
 # ---------------------------------------------------------------------------- #
 # Define parameter numbers for temporal results for VAR models ----
 # ---------------------------------------------------------------------------- #
@@ -92,19 +86,19 @@ unique(mlvarfit$parameters$wilevel.standardized$stdyx.standardized$cluster)
 # Manually define parameter numbers in fit object for standardized autoregressive 
 # and cross-lagged model coefficients
 
-  # For 8-node VAR model (parameters 1-64, whereas 65-92 are contemporaneous effects, 
+  # For 8-node model (parameters 1-64, whereas 65-92 are contemporaneous effects, 
   # 93-100 are intercepts, and 101-108 are residual variances)
 
 # View(varfit[[1]]$parameters$stdyx.standardized) # Example participant
 param_numbers_var <- 1:64
 
-  # For 7-node VAR model with "control" (parameters 1-49, whereas 50-70 are contemporaneous 
+  # For 7-node model with "control" (parameters 1-49, whereas 50-70 are contemporaneous 
   # effects, 71-77 are intercepts, and 78-84 are residual variances)
 
 # View(varfit_control[[1]]$parameters$stdyx.standardized) # Example participant
 param_numbers_var_control <- 1:49
 
-  # For 7-node VAR model with "fun" (same as for 7-node VAR model with "control")
+  # For 7-node model with "fun" (same as for 7-node model with "control")
 
 # View(varfit_fun[[1]]$parameters$stdyx.standardized) # Example participant
 param_numbers_var_fun <- 1:49
@@ -115,7 +109,7 @@ param_numbers_var_fun <- 1:49
 
 # Define function to extract and threshold standardized temporal results
 
-extract_temporal_results <- function(fit, param_numbers) {
+extract_temporal_var_results <- function(fit, param_numbers) {
   # Extract standardized autoregressive and cross-lagged model coefficients
   
   results <- lapply(fit, function(x) {
@@ -176,78 +170,71 @@ extract_temporal_results <- function(fit, param_numbers) {
 
 # Run function
 
-results_var         <- extract_temporal_results(varfit,         param_numbers_var)
-results_var_control <- extract_temporal_results(varfit_control, param_numbers_var_control)
-results_var_fun     <- extract_temporal_results(varfit_fun,     param_numbers_var_fun)
+results_var         <- extract_temporal_var_results(varfit,         param_numbers_var)
+results_var_control <- extract_temporal_var_results(varfit_control, param_numbers_var_control)
+results_var_fun     <- extract_temporal_var_results(varfit_fun,     param_numbers_var_fun)
 
 # ---------------------------------------------------------------------------- #
-# Define parameter numbers for temporal results for VAR models ----
+# Define parameter numbers for temporal results for ML-VAR models ----
 # ---------------------------------------------------------------------------- #
 
 # Manually define parameter numbers in fit object for standardized autoregressive 
 # and cross-lagged model coefficients
 
-  # For 8-node VAR model (parameters 1-64, whereas 65-92 are contemporaneous effects, 
-  # 93-100 are intercepts, and 101-108 are residual variances)
+  # For 8-node model (parameters 1-64, whereas 65-92 are contemporaneous effects 
+  # and 93-100 are residual variances)
 
-# View(varfit[[1]]$parameters$stdyx.standardized) # Example participant
-param_numbers_var <- 1:64
+# View(mlvarfit$parameters$wilevel.standardized$stdyx.standardized)
+param_numbers_mlvar <- 1:64
 
-  # For 7-node VAR model with "control" (parameters 1-49, whereas 50-70 are contemporaneous 
-  # effects, 71-77 are intercepts, and 78-84 are residual variances)
+  # For 7-node model with "control" (parameters 1-49, whereas 50-70 are contemporaneous 
+  # effects and 71-77 are residual variances)
 
-# View(varfit_control[[1]]$parameters$stdyx.standardized) # Example participant
-param_numbers_var_control <- 1:49
+# View(mlvarfit_control$parameters$wilevel.standardized$stdyx.standardized)
+param_numbers_mlvar_control <- 1:49
 
-  # For 7-node VAR model with "fun" (same as for 7-node VAR model with "control")
+  # For 7-node model with "fun" (same as for 7-node model with "control")
 
-# View(varfit_fun[[1]]$parameters$stdyx.standardized) # Example participant
-param_numbers_var_fun <- 1:49
+# View(mlvarfit_fun$parameters$wilevel.standardized$stdyx.standardized)
+param_numbers_mlvar_fun <- 1:49
 
 # ---------------------------------------------------------------------------- #
-# Extract and threshold temporal results for VAR models ----
+# Extract and threshold temporal results for ML-VAR models ----
 # ---------------------------------------------------------------------------- #
 
 # Define function to extract and threshold standardized temporal results
 
-extract_temporal_results <- function(fit, param_numbers) {
+extract_temporal_mlvar_results <- function(fit, param_numbers) {
   # Extract standardized autoregressive and cross-lagged model coefficients
   
-  results <- lapply(fit, function(x) {
-    out <- cbind(param_numbers,
-                 x$parameters$stdyx.standardized[param_numbers,
-                                                 c("paramHeader", "param", 
-                                                   "est", "lower_2.5ci", "upper_2.5ci")])
-    
-    names(out)[names(out) == "param_numbers"] <- "param_number"
-    
-    return(out)
-  })
+  results <- fit$parameters$wilevel.standardized$stdyx.standardized
   
-  # Add "lifepak_id" column to each data frame in list
+  names(results)[names(results) == "cluster"] <- "lifepak_id"
   
-  for (i in 1:length(results)) {
-    results[[i]]$lifepak_id <- names(results[i])
-    
-    results[[i]] <- results[[i]][, c("lifepak_id", names(results[[i]])[names(results[[i]]) != "lifepak_id"])]
-  }
+  # Note: Use factor version of "lifepak_id" to preserve participant order
   
-  # Stack results for all participants in one data frame
+  results$lifepak_id_fct <- factor(results$lifepak_id, levels = unique(results$lifepak_id))
   
-  results <- do.call(rbind, results)
+  results <- results %>%
+    group_by(lifepak_id_fct) %>%
+    slice(param_numbers) %>%
+    ungroup()
+  
+  results <- results[, c("lifepak_id", "paramHeader", "param", 
+                         "est", "lower_2.5ci", "upper_2.5ci")]
   
   # Create columns for criterion and predictor variable names (based on all 8
   # possible nodes; in 7-node networks, only 7 of the 8 lines below will apply)
   
   results$criterion <- NA
-  results$criterion[results$paramHeader == "BAD.ON"]  <- "bad"
-  results$criterion[results$paramHeader == "CONT.ON"] <- "control"
-  results$criterion[results$paramHeader == "ENER.ON"] <- "energy"
-  results$criterion[results$paramHeader == "FOC.ON"]  <- "focus"
-  results$criterion[results$paramHeader == "FUN.ON"]  <- "fun"
-  results$criterion[results$paramHeader == "INT.ON"]  <- "interest"
-  results$criterion[results$paramHeader == "MOVE.ON"] <- "movement"
-  results$criterion[results$paramHeader == "SAD.ON"]  <- "sad"
+  results$criterion[grepl("BAD.ON",  results$paramHeader)] <- "bad"
+  results$criterion[grepl("CONT.ON", results$paramHeader)] <- "control"
+  results$criterion[grepl("ENER.ON", results$paramHeader)] <- "energy"
+  results$criterion[grepl("FOC.ON",  results$paramHeader)] <- "focus"
+  results$criterion[grepl("FUN.ON",  results$paramHeader)] <- "fun"
+  results$criterion[grepl("INT.ON",  results$paramHeader)] <- "interest"
+  results$criterion[grepl("MOVE.ON", results$paramHeader)] <- "movement"
+  results$criterion[grepl("SAD.ON",  results$paramHeader)] <- "sad"
   
   results$predictor <- NA
   results$predictor[results$param == "BAD&1"]  <- "bad"
@@ -265,18 +252,18 @@ extract_temporal_results <- function(fit, param_numbers) {
   
   results$est_thres <- ifelse((results$lower_2.5ci > 0 & results$upper_2.5ci > 0) |
                                 (results$lower_2.5ci < 0 & results$upper_2.5ci < 0), results$est, 0)
-  
+
   return(results)
 }
 
 # Run function
 
-results_var         <- extract_temporal_results(varfit,         param_numbers_var)
-results_var_control <- extract_temporal_results(varfit_control, param_numbers_var_control)
-results_var_fun     <- extract_temporal_results(varfit_fun,     param_numbers_var_fun)
+results_mlvar         <- extract_temporal_mlvar_results(mlvarfit,         param_numbers_mlvar)
+results_mlvar_control <- extract_temporal_mlvar_results(mlvarfit_control, param_numbers_mlvar_control)
+results_mlvar_fun     <- extract_temporal_mlvar_results(mlvarfit_fun,     param_numbers_mlvar_fun)
 
 # ---------------------------------------------------------------------------- #
-# Create thresholded adjacency matrices for VAR models ----
+# Create thresholded adjacency matrices for VAR and ML-VAR models ----
 # ---------------------------------------------------------------------------- #
 
 # Define function to create directed adjacency matrix of thresholded autoregressive 
@@ -285,9 +272,12 @@ results_var_fun     <- extract_temporal_results(varfit_fun,     param_numbers_va
 
 create_thres_adj_mat <- function(participant_results) {
   variables <- unique(c(participant_results$criterion, participant_results$predictor))
+  
   adj_mat <- matrix(NA, nrow = length(variables), ncol = length(variables))
+  
   rownames(adj_mat) <- variables
   colnames(adj_mat) <- variables
+  
   for (i in 1:nrow(participant_results)) {
     predictor <- participant_results$predictor[i]
     criterion <- participant_results$criterion[i]
@@ -314,236 +304,59 @@ create_thres_adj_mats <- function(results) {
 
 # Run function to create adjacency matrices
 
-thres_adj_mats_var         <- create_thres_adj_mats(results_var)
-thres_adj_mats_var_control <- create_thres_adj_mats(results_var_control)
-thres_adj_mats_var_fun     <- create_thres_adj_mats(results_var_fun)
+thres_adj_mats_var           <- create_thres_adj_mats(results_var)
+thres_adj_mats_var_control   <- create_thres_adj_mats(results_var_control)
+thres_adj_mats_var_fun       <- create_thres_adj_mats(results_var_fun)
 
-
-
-
-# TODO: Separate extraction of model coefficients and creation of adjacency
-# matrices from computation of network parameters. Also, condense code using
-# custom functions rather than repeating code across several models.
-
-
-
+thres_adj_mats_mlvar         <- create_thres_adj_mats(results_mlvar)
+thres_adj_mats_mlvar_control <- create_thres_adj_mats(results_mlvar_control)
+thres_adj_mats_mlvar_fun     <- create_thres_adj_mats(results_mlvar_fun)
 
 # ---------------------------------------------------------------------------- #
-# Extract and threshold temporal results for 8-node ML-VAR model ----
+# Sort results and adjacency matrices by "lifepak_id" ----
 # ---------------------------------------------------------------------------- #
 
-param_numbers_mlvar <- 1:64
+# VAR results and adjacency matrices are already sorted by "lifepak_id"
 
-# Extract standardized autoregressive and cross-lagged model coefficients
+all(unique(results_var$lifepak_id)         == ids)
+all(unique(results_var_control$lifepak_id) == ids)
+all(unique(results_var_fun$lifepak_id)     == ids)
 
-results_mlvar <- mlvarfit$parameters$wilevel.standardized$stdyx.standardized
+all(names(thres_adj_mats_var)         == ids)
+all(names(thres_adj_mats_var_control) == ids)
+all(names(thres_adj_mats_var_fun)     == ids)
 
-names(results_mlvar)[names(results_mlvar) == "cluster"] <- "lifepak_id"
+# Sort ML-VAR results and adjacency matrices
 
-results_mlvar <- results_mlvar %>%
-  group_by(lifepak_id) %>%
-  slice(param_numbers_mlvar) %>%
-  ungroup()
+results_mlvar         <- results_mlvar[order(results_mlvar$lifepak_id), ]
+results_mlvar_control <- results_mlvar_control[order(results_mlvar_control$lifepak_id), ]
+results_mlvar_fun     <- results_mlvar_fun[order(results_mlvar_fun$lifepak_id), ]
 
-results_mlvar <- results_mlvar[, c("lifepak_id", "paramHeader", "param", 
-                                   "est", "lower_2.5ci", "upper_2.5ci")]
-
-# Create columns for criterion and predictor variable names (based on all 8
-# possible nodes; in 7-node networks, only 7 of the 8 lines below will apply)
-
-results_mlvar$criterion <- NA
-results_mlvar$criterion[grepl("BAD.ON",  results_mlvar$paramHeader)] <- "bad"
-results_mlvar$criterion[grepl("CONT.ON", results_mlvar$paramHeader)] <- "control"
-results_mlvar$criterion[grepl("ENER.ON", results_mlvar$paramHeader)] <- "energy"
-results_mlvar$criterion[grepl("FOC.ON",  results_mlvar$paramHeader)] <- "focus"
-results_mlvar$criterion[grepl("FUN.ON",  results_mlvar$paramHeader)] <- "fun"
-results_mlvar$criterion[grepl("INT.ON",  results_mlvar$paramHeader)] <- "interest"
-results_mlvar$criterion[grepl("MOVE.ON", results_mlvar$paramHeader)] <- "movement"
-results_mlvar$criterion[grepl("SAD.ON",  results_mlvar$paramHeader)] <- "sad"
-
-results_mlvar$predictor <- NA
-results_mlvar$predictor[results_mlvar$param == "BAD&1"]  <- "bad"
-results_mlvar$predictor[results_mlvar$param == "CONT&1"] <- "control"
-results_mlvar$predictor[results_mlvar$param == "ENER&1"] <- "energy"
-results_mlvar$predictor[results_mlvar$param == "FOC&1"]  <- "focus"
-results_mlvar$predictor[results_mlvar$param == "FUN&1"]  <- "fun"
-results_mlvar$predictor[results_mlvar$param == "INT&1"]  <- "interest"
-results_mlvar$predictor[results_mlvar$param == "MOVE&1"] <- "movement"
-results_mlvar$predictor[results_mlvar$param == "SAD&1"]  <- "sad"
-
-# Threshold edges based on significance
-
-results_mlvar$est_thres <- NA
-
-results_mlvar$est_thres <- ifelse((results_mlvar$lower_2.5ci > 0 & results_mlvar$upper_2.5ci > 0) |
-                                    (results_mlvar$lower_2.5ci < 0 & results_mlvar$upper_2.5ci < 0), results_mlvar$est, 0)
-
-# TODO: Create adjacency matrices using functions for VAR models above
-
-
-
-
+thres_adj_mats_mlvar         <- thres_adj_mats_mlvar[as.character(sort(as.integer(names(thres_adj_mats_mlvar))))]
+thres_adj_mats_mlvar_control <- thres_adj_mats_mlvar_control[as.character(sort(as.integer(names(thres_adj_mats_mlvar_control))))]
+thres_adj_mats_mlvar_fun     <- thres_adj_mats_mlvar_fun[as.character(sort(as.integer(names(thres_adj_mats_mlvar_fun))))]
 
 # ---------------------------------------------------------------------------- #
-# Extracting the person-specific parameters for the 7-node ML-VAR network with control ----
+# Export temporal network results and adjacency matrices ----
 # ---------------------------------------------------------------------------- #
 
-parameters_mlvar_solution_control <- mlvarfit_control$parameters$wilevel.standardized$stdyx.standardized
+extracted_results_path <- "./02_networks/results/extracted/"
 
-results_mlvar_control <- parameters_mlvar_solution_control
+dir.create(extracted_results_path)
 
-# Subset the dataframe to keep only the desired rows
-results_mlvar_control <- results_mlvar_control %>%
-  group_by(cluster) %>%
-  slice_head(n = 49) %>%
-  ungroup()
+save(results_var,           file = paste0(extracted_results_path, "results_var.RDS"))
+save(results_var_control,   file = paste0(extracted_results_path, "results_var_control.RDS"))
+save(results_var_fun,       file = paste0(extracted_results_path, "results_var_fun.RDS"))
 
-#create a column in the dataframe that signifies to which participant do the given set of coefficients belong. 
-# Calculate the number of participants
-num_participants <- ceiling(nrow(results_mlvar_control) / 49)
+save(results_mlvar,         file = paste0(extracted_results_path, "results_mlvar.RDS"))
+save(results_mlvar_control, file = paste0(extracted_results_path, "results_mlvar_control.RDS"))
+save(results_mlvar_fun,     file = paste0(extracted_results_path, "results_mlvar_fun.RDS"))
 
-# Create the participant labels
-participant_labels <- rep(paste0("Participant ", 1:num_participants), each = 49, length.out = nrow(results_mlvar_control))
+save(thres_adj_mats_var,           file = paste0(extracted_results_path, "thres_adj_mats_var.RDS"))
+save(thres_adj_mats_var_control,   file = paste0(extracted_results_path, "thres_adj_mats_var_control.RDS"))
+save(thres_adj_mats_var_fun,       file = paste0(extracted_results_path, "thres_adj_mats_var_fun.RDS"))
 
-# Add the new column to the dataframe
-results_mlvar_control$Participant <- participant_labels
-
-results_mlvar_control <- results_mlvar_control[, c("Participant", "paramHeader", "param", "est", "lower_2.5ci", "upper_2.5ci", "sig", "cluster")]
-
-#create the column with criterion variable names
-
-variables <- c("bad", "control", "energy", "focus", "interest", "movement", "sad")
-
-repeated_variables <- rep(rep(variables, each = 7), length.out = nrow(results_mlvar_control))
-
-results_mlvar_control$criterion <- repeated_variables
-
-#create the column with predictor variable names
-repeated_predictor_variables <- rep(variables, length.out = nrow(results_mlvar_control))
-
-results_mlvar_control$predictor <- repeated_predictor_variables
-
-#replacing non-significant edges with zeroes
-
-results_mlvar_control$est <- ifelse((results_mlvar_control$lower_2.5ci > 0 & results_mlvar_control$upper_2.5ci > 0) |
-                              (results_mlvar_control$lower_2.5ci < 0 & results_mlvar_control$upper_2.5ci < 0), results_mlvar_control$est, 0)
-
-# ---------------------------------------------------------------------------- #
-# Creating the adjacency matrix from ML-VAR parameters for the 7-node ML-VAR network with control ----
-# ---------------------------------------------------------------------------- #
-
-#create an adjacency matrix of auto-regressive and cross-regressive coefficients
-#create a directed adjacency matrix for each participant
-
-# Function to create adjacency matrix for a given participant's data
-create_adjacency_matrix <- function(participant_data) {
-  variables_mlvar_control <- unique(c(participant_data$criterion, participant_data$predictor))
-  adj_matrix <- matrix(NA, nrow = length(variables_mlvar_control), ncol = length(variables_mlvar_control))
-  rownames(adj_matrix) <- variables_mlvar_control
-  colnames(adj_matrix) <- variables_mlvar_control
-  for (i in 1:nrow(participant_data)) {
-    predictor <- participant_data$predictor[i]
-    criterion <- participant_data$criterion[i]
-    relationship <- participant_data$est[i]
-    adj_matrix[predictor, criterion] <- relationship
-  }
-  return(adj_matrix)
-}
-
-# Group data by participant and create adjacency matrices
-adjacency_matrices_mlvar_control <- results_mlvar_control %>%
-  group_by(Participant) %>%
-  group_split() %>%
-  lapply(create_adjacency_matrix)
-
-# Naming the list elements by Participant IDs 
-names(adjacency_matrices_mlvar_control) <- unique(results_mlvar_control$Participant)
-
-# ---------------------------------------------------------------------------- #
-# Extracting the person-specific parameters for the 7-node ML-VAR network with fun ----
-# ---------------------------------------------------------------------------- #
-
-parameters_mlvar_solution_fun <- mlvarfit_fun$parameters$wilevel.standardized$stdyx.standardized
-
-# ---------------------------------------------------------------------------- #
-# Creating the adjacency matrix from ML-VAR parameters for the 7-node network with fun ----
-# ---------------------------------------------------------------------------- #
-
-mlvarfit_fun <- readRDS(file = "./02_networks/results/mlvarfit_fun.RDS")
-
-results_mlvar_fun <- parameters_mlvar_solution_fun
-
-# Subset the dataframe to keep only the desired rows
-results_mlvar_fun <- results_mlvar_fun %>%
-  group_by(cluster) %>%
-  slice_head(n = 49) %>%
-  ungroup()
-
-#create a column in the dataframe that signifies to which participant do the given set of coefficients belong. 
-# Calculate the number of participants
-num_participants <- ceiling(nrow(results_mlvar_fun) / 49)
-
-# Create the participant labels
-participant_labels <- rep(paste0("Participant ", 1:num_participants), each = 49, length.out = nrow(results_mlvar_fun))
-
-# Add the new column to the dataframe
-results_mlvar_fun$Participant <- participant_labels
-
-results_mlvar_fun <- results_mlvar_fun[, c("Participant", "paramHeader", "param", "est", "lower_2.5ci", "upper_2.5ci", "sig", "cluster")]
-
-#create the column with criterion variable names
-
-variables <- c("bad", "energy", "focus", "fun", "interest", "movement", "sad")
-
-repeated_variables <- rep(rep(variables, each = 7), length.out = nrow(results_mlvar_fun))
-
-results_mlvar_fun$criterion <- repeated_variables
-
-#create the column with predictor variable names
-repeated_predictor_variables <- rep(variables, length.out = nrow(results_mlvar_fun))
-
-results_mlvar_fun$predictor <- repeated_predictor_variables
-
-#replacing non-significant edges with zeroes
-
-results_mlvar_fun$est <- ifelse((results_mlvar_fun$lower_2.5ci > 0 & results_mlvar_fun$upper_2.5ci > 0) |
-                                      (results_mlvar_fun$lower_2.5ci < 0 & results_mlvar_fun$upper_2.5ci < 0), results_mlvar_fun$est, 0)
-
-# ---------------------------------------------------------------------------- #
-# Creating the adjacency matrix from ML-VAR parameters for the 7-node network with fun ----
-# ---------------------------------------------------------------------------- #
-
-#create an adjacency matrix of auto-regressive and cross-regressive coefficients
-#create a directed adjacency matrix for each participant
-
-# Function to create adjacency matrix for a given participant's data
-create_adjacency_matrix <- function(participant_data) {
-  variables_mlvar_fun <- unique(c(participant_data$criterion, participant_data$predictor))
-  adj_matrix <- matrix(NA, nrow = length(variables_mlvar_fun), ncol = length(variables_mlvar_fun))
-  rownames(adj_matrix) <- variables_mlvar_fun
-  colnames(adj_matrix) <- variables_mlvar_fun
-  for (i in 1:nrow(participant_data)) {
-    predictor <- participant_data$predictor[i]
-    criterion <- participant_data$criterion[i]
-    relationship <- participant_data$est[i]
-    adj_matrix[predictor, criterion] <- relationship
-  }
-  return(adj_matrix)
-}
-
-# Group data by participant and create adjacency matrices
-adjacency_matrices_mlvar_fun <- results_mlvar_fun %>%
-  group_by(Participant) %>%
-  group_split() %>%
-  lapply(create_adjacency_matrix)
-
-# Naming the list elements by Participant IDs 
-names(adjacency_matrices_mlvar_fun) <- unique(results_mlvar_fun$Participant)
-
-# ---------------------------------------------------------------------------- #
-# TODO: Export temporal network results ----
-# ---------------------------------------------------------------------------- #
-
-
-
+save(thres_adj_mats_mlvar,         file = paste0(extracted_results_path, "thres_adj_mats_mlvar.RDS"))
+save(thres_adj_mats_mlvar_control, file = paste0(extracted_results_path, "thres_adj_mats_mlvar_control.RDS"))
+save(thres_adj_mats_mlvar_fun,     file = paste0(extracted_results_path, "thres_adj_mats_mlvar_fun.RDS"))
 
