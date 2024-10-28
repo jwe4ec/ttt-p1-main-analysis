@@ -77,9 +77,9 @@ save(ids, file = "./02_networks/data/final_clean/ids.RDS")
 
 varfit <- list()
 
-mplus_var_path <- "./02_networks/results/mplus_var/"
+mplus_var_path <- "./02_networks/results/raw/mplus_var/"
 
-if (!(dir.exists(mplus_var_path))) {dir.create(mplus_var_path)}
+if (!(dir.exists(mplus_var_path))) {dir.create(mplus_var_path, recursive = TRUE)}
 
 setwd(mplus_var_path)
 
@@ -100,7 +100,7 @@ rm(tmp)
 
 setwd(wd_dir)
 
-saveRDS(varfit, file = "./02_networks/results/varfit.RDS")
+saveRDS(varfit, file = "./02_networks/results/raw/varfit.RDS")
 
 # ---------------------------------------------------------------------------- #
 # Run idiographic VAR models using 7 nodes (including "control"; excluding "fun") ----
@@ -108,7 +108,7 @@ saveRDS(varfit, file = "./02_networks/results/varfit.RDS")
 
 varfit_control <- list()
 
-mplus_var_control_path <- "./02_networks/results/mplus_var_control/"
+mplus_var_control_path <- "./02_networks/results/raw/mplus_var_control/"
 
 if (!(dir.exists(mplus_var_control_path))) {dir.create(mplus_var_control_path)}
 
@@ -135,7 +135,7 @@ rm(tmp)
 
 setwd(wd_dir)
 
-saveRDS(varfit_control, file = "./02_networks/results/varfit_control.RDS")
+saveRDS(varfit_control, file = "./02_networks/results/raw/varfit_control.RDS")
 
 # ---------------------------------------------------------------------------- #
 # Run idiographic VAR models using 7 nodes (including "fun"; excluding "control") ----
@@ -143,7 +143,7 @@ saveRDS(varfit_control, file = "./02_networks/results/varfit_control.RDS")
 
 varfit_fun <- list()
 
-mplus_var_fun_path <- "./02_networks/results/mplus_var_fun/"
+mplus_var_fun_path <- "./02_networks/results/raw/mplus_var_fun/"
 
 if (!(dir.exists(mplus_var_fun_path))) {dir.create(mplus_var_fun_path)}
 
@@ -166,7 +166,7 @@ rm(tmp)
 
 setwd(wd_dir)
 
-saveRDS(varfit_fun, file = "./02_networks/results/varfit_fun.RDS")
+saveRDS(varfit_fun, file = "./02_networks/results/raw/varfit_fun.RDS")
 
 # ---------------------------------------------------------------------------- #
 # Run ML-VAR model using all 8 nodes ----
@@ -174,7 +174,7 @@ saveRDS(varfit_fun, file = "./02_networks/results/varfit_fun.RDS")
 
 varfit <- list()
 
-mplus_mlvar_path <- "./02_networks/results/mplus_mlvar/"
+mplus_mlvar_path <- "./02_networks/results/raw/mplus_mlvar/"
 
 if (!(dir.exists(mplus_mlvar_path))) {dir.create(mplus_mlvar_path)}
 
@@ -198,7 +198,7 @@ rm(tmp)
 
 setwd(wd_dir)
 
-saveRDS(mlvarfit, file = "./02_networks/results/mlvarfit.RDS")
+saveRDS(mlvarfit, file = "./02_networks/results/raw/mlvarfit.RDS")
 
 # ---------------------------------------------------------------------------- #
 # Run ML-VAR model using 7 nodes (including "control"; excluding "fun") ----
@@ -206,7 +206,7 @@ saveRDS(mlvarfit, file = "./02_networks/results/mlvarfit.RDS")
 
 varfit <- list()
 
-mplus_mlvar_control_path <- "./02_networks/results/mplus_mlvar_control/"
+mplus_mlvar_control_path <- "./02_networks/results/raw/mplus_mlvar_control/"
 
 if (!(dir.exists(mplus_mlvar_control_path))) {dir.create(mplus_mlvar_control_path)}
 
@@ -228,7 +228,7 @@ rm(tmp)
 
 setwd(wd_dir)
 
-saveRDS(mlvarfit_control, file = "./02_networks/results/mlvarfit_control.RDS")
+saveRDS(mlvarfit_control, file = "./02_networks/results/raw/mlvarfit_control.RDS")
 
 # ---------------------------------------------------------------------------- #
 # Run ML-VAR model using 7 nodes (including "fun"; excluding "control") ----
@@ -236,7 +236,7 @@ saveRDS(mlvarfit_control, file = "./02_networks/results/mlvarfit_control.RDS")
 
 varfit <- list()
 
-mplus_mlvar_fun_path <- "./02_networks/results/mplus_mlvar_fun/"
+mplus_mlvar_fun_path <- "./02_networks/results/raw/mplus_mlvar_fun/"
 
 if (!(dir.exists(mplus_mlvar_fun_path))) {dir.create(mplus_mlvar_fun_path)}
 
@@ -258,4 +258,4 @@ rm(tmp)
 
 setwd(wd_dir)
 
-saveRDS(mlvarfit_fun, file = "./02_networks/results/mlvarfit_fun.RDS")
+saveRDS(mlvarfit_fun, file = "./02_networks/results/raw/mlvarfit_fun.RDS")

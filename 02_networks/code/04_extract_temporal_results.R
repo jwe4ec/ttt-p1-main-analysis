@@ -34,13 +34,13 @@ groundhog.library("dplyr", groundhog_day)
 # Import results ----
 # ---------------------------------------------------------------------------- #
 
-varfit           <- readRDS(file = "./02_networks/results/varfit.RDS")
-varfit_control   <- readRDS(file = "./02_networks/results/varfit_control.RDS")
-varfit_fun       <- readRDS(file = "./02_networks/results/varfit_fun.RDS")
+varfit           <- readRDS(file = "./02_networks/results/raw/varfit.RDS")
+varfit_control   <- readRDS(file = "./02_networks/results/raw/varfit_control.RDS")
+varfit_fun       <- readRDS(file = "./02_networks/results/raw/varfit_fun.RDS")
 
-mlvarfit         <- readRDS(file = "./02_networks/results/mlvarfit.RDS")
-mlvarfit_control <- readRDS(file = "./02_networks/results/mlvarfit_control.RDS")
-mlvarfit_fun     <- readRDS(file = "./02_networks/results/mlvarfit_fun.RDS")
+mlvarfit         <- readRDS(file = "./02_networks/results/raw/mlvarfit.RDS")
+mlvarfit_control <- readRDS(file = "./02_networks/results/raw/mlvarfit_control.RDS")
+mlvarfit_fun     <- readRDS(file = "./02_networks/results/raw/mlvarfit_fun.RDS")
 
 # Load Lifepak IDs
 
