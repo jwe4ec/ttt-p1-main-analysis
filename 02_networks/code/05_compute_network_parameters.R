@@ -3,6 +3,13 @@
 # Authors: Josip Razum, Jeremy W. Eberle
 # ---------------------------------------------------------------------------- #
 
+# TODO: Separate extraction of model coefficients and creation of adjacency
+# matrices from computation of network parameters
+
+
+
+
+
 # ---------------------------------------------------------------------------- #
 # Notes ----
 # ---------------------------------------------------------------------------- #
