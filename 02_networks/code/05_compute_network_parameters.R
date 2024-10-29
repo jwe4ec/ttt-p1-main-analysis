@@ -363,7 +363,56 @@ compute_select_exp_inf <- function(adj_mats) {
 select_exp_inf_var   <- compute_select_exp_inf(thres_adj_mats_var)
 select_exp_inf_mlvar <- compute_select_exp_inf(thres_adj_mats_mlvar)
 
-# TODO: Condense code below using custom functions
+# ---------------------------------------------------------------------------- #
+# Label network parameters and merge into one data frame ----
+# ---------------------------------------------------------------------------- #
+
+# Define function to label network parameters and merge into one data frame
+
+merge_net_params <- function(exp_inf_cent,  exp_inf_cent_control,  exp_inf_cent_fun,
+                             avg_cont_cent, avg_cont_cent_control, avg_cont_cent_fun,
+                             mod_cont_cent, mod_cont_cent_control, mod_cont_cent_fun,
+                             global_exp_inf,
+                             select_exp_inf) {
+  # TODO: Label network parameters
+  
+  
+  
+  
+  
+  # TODO: Append column names and labels for ML-VAR
+  
+  
+  
+  
+  
+  # Merge into one data frame
+  
+  dfs <- list(exp_inf_cent,  exp_inf_cent_control,  exp_inf_cent_fun,
+              avg_cont_cent, avg_cont_cent_control, avg_cont_cent_fun,
+              mod_cont_cent, mod_cont_cent_control, mod_cont_cent_fun,
+              global_exp_inf,
+              select_exp_inf)
+  
+  merged_df <- Reduce(function(x, y) merge(x, y, by = "lifepak_id", all = TRUE), 
+                      dfs)
+  
+  return(merged_df)
+}
+
+# (TODO: Check the merging) Run function for VAR and ML-VAR network parameters
+
+net_params_var   <- merge_net_params(exp_inf_cent_var,    exp_inf_cent_var_control,    exp_inf_cent_var_fun, 
+                                     avg_cont_cent_var,   avg_cont_cent_var_control,   avg_cont_cent_var_fun, 
+                                     mod_cont_cent_var,   mod_cont_cent_var_control,   mod_cont_cent_var_fun, 
+                                     global_exp_inf_var, 
+                                     select_exp_inf_var)
+
+net_params_mlvar <- merge_net_params(exp_inf_cent_mlvar,  exp_inf_cent_mlvar_control,  exp_inf_cent_mlvar_fun, 
+                                     avg_cont_cent_mlvar, avg_cont_cent_mlvar_control, avg_cont_cent_mlvar_fun, 
+                                     mod_cont_cent_mlvar, mod_cont_cent_mlvar_control, mod_cont_cent_mlvar_fun, 
+                                     global_exp_inf_mlvar, 
+                                     select_exp_inf_mlvar)
 
 
 
