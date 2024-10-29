@@ -26,7 +26,7 @@ source("./02_networks/code/01_define_functions.R")
 
 groundhog_day <- version_control()
 
-# # TODO (Determine which ones are needed): Load packages
+# TODO (Determine which ones are needed): Load packages
 
 pkgs <- c("dplyr", "tidyr", "Hmisc", "networktools", "netcontrol")
 
@@ -58,10 +58,31 @@ load(paste0(extracted_results_path, "thres_adj_mats_mlvar.RDS"))
 load(paste0(extracted_results_path, "thres_adj_mats_mlvar_control.RDS"))
 load(paste0(extracted_results_path, "thres_adj_mats_mlvar_fun.RDS"))
 
-# TODO: Condense code below using custom functions
+# ---------------------------------------------------------------------------- #
+# Define function used throughout script  ----
+# ---------------------------------------------------------------------------- #
 
+# Define function for 7-node networks that restricts a given centrality metric
+# to only that for "control" or "fun" (depending on which node was included in
+# the network) and labels the centralities as derived from 7-node networks
 
-
+restrict_to_control_fun_and_label_7 <- function(df, network_type, metric) {
+  if (network_type %in% c("7-node with control", "7-node with fun")) {
+    if (network_type == "7-node with control") {
+      retain_node_vars <- paste0("control_", metric)
+    } else if (network_type == "7-node with fun") {
+      retain_node_vars <- paste0("fun_",     metric)
+    }
+    
+    df <- df[, c("lifepak_id", retain_node_vars)]
+    
+    target_cols <- names(df)[names(df) %in% retain_node_vars]
+    
+    names(df)[names(df) %in% target_cols] <- paste0(target_cols, "_7")
+  }
+  
+  return(df)
+}
 
 # ---------------------------------------------------------------------------- #
 # Compute expected influence centrality for temporal VAR and ML-VAR networks ----
@@ -70,7 +91,7 @@ load(paste0(extracted_results_path, "thres_adj_mats_mlvar_fun.RDS"))
 # Define function to compute outgoing one- and two-step expected influence centralities
 # (note that these include both autoregressive and cross-lagged effects)
 
-compute_exp_inf_cent <- function(adj_mats) {
+compute_exp_inf_cent <- function(adj_mats, network_type) {
   # Compute outgoing one- and two-step expected influence centralities
   
   exp_inf_cent <- lapply(adj_mats, function(x) {
@@ -112,46 +133,26 @@ compute_exp_inf_cent <- function(adj_mats) {
                                          names(exp_inf_cent_df)[grep("_step1", names(exp_inf_cent_df))],
                                          names(exp_inf_cent_df)[grep("_step2", names(exp_inf_cent_df))])]
   
+  # For 7-node networks, restrict to expected influence centralities of only
+  # "control" or "fun" (depending on which node was included in the network)
+  # and label the centralities as derived from 7-node networks
+  
+  metric <- c("step1", "step2")
+  
+  exp_inf_cent_df <- restrict_to_control_fun_and_label_7(exp_inf_cent_df, network_type, metric)
+  
   return(exp_inf_cent_df)
 }
 
 # Run function
 
-exp_inf_cent_var           <- compute_exp_inf_cent(thres_adj_mats_var)
-exp_inf_cent_var_control   <- compute_exp_inf_cent(thres_adj_mats_var_control)
-exp_inf_cent_var_fun       <- compute_exp_inf_cent(thres_adj_mats_var_fun)
+exp_inf_cent_var           <- compute_exp_inf_cent(thres_adj_mats_var,           "8-node")
+exp_inf_cent_var_control   <- compute_exp_inf_cent(thres_adj_mats_var_control,   "7-node with control")
+exp_inf_cent_var_fun       <- compute_exp_inf_cent(thres_adj_mats_var_fun,       "7-node with fun")
 
-exp_inf_cent_mlvar         <- compute_exp_inf_cent(thres_adj_mats_mlvar)
-exp_inf_cent_mlvar_control <- compute_exp_inf_cent(thres_adj_mats_mlvar_control)
-exp_inf_cent_mlvar_fun     <- compute_exp_inf_cent(thres_adj_mats_mlvar_fun)
-
-
-
-
-
-# TODO: Address the following code for 8-node VAR network
-
-all_person_spec_parameters <- expected_influence_wide
-
-#compute mean expected influence of the 2 core depression symptoms (sad and interest)
-all_person_spec_parameters <- all_person_spec_parameters %>%
-  rowwise() %>%
-  mutate(m_ei_s1_sad_int = mean(c(sad_step1, interest_step1), na.rm = TRUE),
-         m_ei_s2_sad_int = mean(c(sad_step2, interest_step2), na.rm = TRUE)) %>%
-  ungroup()
-
-# TODO: Address the following code for 8-node ML-VAR network
-
-#compute mean expected influence of the 2 core depression symptoms (sad and interest)
-all_person_spec_parameters_mlvar <- all_person_spec_parameters_mlvar %>%
-  rowwise() %>%
-  mutate(m_ei_s1_sad_int = mean(c(sad_step1, interest_step1),na.rm = TRUE),
-         m_ei_s2_sad_int = mean(c(sad_step2, interest_step2), na.rm = TRUE)) %>%
-  ungroup()
-
-
-
-
+exp_inf_cent_mlvar         <- compute_exp_inf_cent(thres_adj_mats_mlvar,         "8-node")
+exp_inf_cent_mlvar_control <- compute_exp_inf_cent(thres_adj_mats_mlvar_control, "7-node with control")
+exp_inf_cent_mlvar_fun     <- compute_exp_inf_cent(thres_adj_mats_mlvar_fun,     "7-node with fun")
 
 # ---------------------------------------------------------------------------- #
 # Compute average controllability centrality for temporal VAR and ML-VAR networks ----
@@ -159,7 +160,7 @@ all_person_spec_parameters_mlvar <- all_person_spec_parameters_mlvar %>%
 
 # Define function to compute average controllability centrality
 
-compute_avg_cont_cent <- function(adj_mats) {
+compute_avg_cont_cent <- function(adj_mats, network_type) {
   # Obtain node names
   
   node_vars <- colnames(adj_mats[[1]])
@@ -176,50 +177,34 @@ compute_avg_cont_cent <- function(adj_mats) {
   
   # Transform resulting list into data frame
   
-  avg_cont_cent <- as.data.frame(do.call(rbind, avg_cont_cent))
+  avg_cont_cent_df <- as.data.frame(do.call(rbind, avg_cont_cent))
   
-  avg_cont_cent$lifepak_id <- rownames(avg_cont_cent)
+  avg_cont_cent_df$lifepak_id <- rownames(avg_cont_cent_df)
   
-  rownames(avg_cont_cent) <- NULL
+  rownames(avg_cont_cent_df) <- NULL
   
-  avg_cont_cent <- avg_cont_cent %>% relocate(lifepak_id)
+  avg_cont_cent_df <- avg_cont_cent_df %>% relocate(lifepak_id)
   
-  return(avg_cont_cent)
+  # For 7-node networks, restrict to average controllability centralities of only
+  # "control" or "fun" (depending on which node was included in the network)
+  # and label the centralities as derived from 7-node networks
+  
+  metric <- "acc"
+  
+  avg_cont_cent_df <- restrict_to_control_fun_and_label_7(avg_cont_cent_df, network_type, metric)
+  
+  return(avg_cont_cent_df)
 }
 
 # Run function
 
-avg_cont_cent_var           <- compute_avg_cont_cent(thres_adj_mats_var)
-avg_cont_cent_var_control   <- compute_avg_cont_cent(thres_adj_mats_var_control)
-avg_cont_cent_var_fun       <- compute_avg_cont_cent(thres_adj_mats_var_fun)
+avg_cont_cent_var           <- compute_avg_cont_cent(thres_adj_mats_var,           "8-node")
+avg_cont_cent_var_control   <- compute_avg_cont_cent(thres_adj_mats_var_control,   "7-node with control")
+avg_cont_cent_var_fun       <- compute_avg_cont_cent(thres_adj_mats_var_fun,       "7-node with fun")
 
-avg_cont_cent_mlvar         <- compute_avg_cont_cent(thres_adj_mats_mlvar)
-avg_cont_cent_mlvar_control <- compute_avg_cont_cent(thres_adj_mats_mlvar_control)
-avg_cont_cent_mlvar_fun     <- compute_avg_cont_cent(thres_adj_mats_mlvar_fun)
-
-
-
-
-
-# TODO: Address the following code for 8-node VAR network
-
-#compute mean average controllability centrality of the 2 core depression symptoms (sad and interest)
-results_ave_cont_centrality <- results_ave_cont_centrality %>%
-  rowwise() %>%
-  mutate(m_acc_sad_int = mean(c(sad_acc, interest_acc), na.rm = TRUE)) %>%
-  ungroup()
-
-# TODO: Address the following code for 8-node ML-VAR network
-
-#compute mean average controllability centrality of the 2 core depression symptoms (sad and interest)
-results_ave_cont_centrality_mlvar <- results_ave_cont_centrality_mlvar %>%
-  rowwise() %>%
-  mutate(m_acc_sad_int = mean(c(sad_acc, interest_acc), na.rm = TRUE)) %>%
-  ungroup()
-
-
-
-
+avg_cont_cent_mlvar         <- compute_avg_cont_cent(thres_adj_mats_mlvar,         "8-node")
+avg_cont_cent_mlvar_control <- compute_avg_cont_cent(thres_adj_mats_mlvar_control, "7-node with control")
+avg_cont_cent_mlvar_fun     <- compute_avg_cont_cent(thres_adj_mats_mlvar_fun,     "7-node with fun")
 
 # ---------------------------------------------------------------------------- #
 # Compute modal controllability centrality for temporal VAR and ML-VAR networks ----
@@ -227,7 +212,7 @@ results_ave_cont_centrality_mlvar <- results_ave_cont_centrality_mlvar %>%
 
 # Define function to compute modal controllability centrality
 
-compute_mod_cont_cent <- function(adj_mats) {
+compute_mod_cont_cent <- function(adj_mats, network_type) {
   # Obtain node names
   
   node_vars <- colnames(adj_mats[[1]])
@@ -244,235 +229,141 @@ compute_mod_cont_cent <- function(adj_mats) {
 
   # Transform resulting list into data frame
 
-  mod_cont_cent <- as.data.frame(do.call(rbind, mod_cont_cent))
+  mod_cont_cent_df <- as.data.frame(do.call(rbind, mod_cont_cent))
 
-  mod_cont_cent$lifepak_id <- rownames(mod_cont_cent)
+  mod_cont_cent_df$lifepak_id <- rownames(mod_cont_cent_df)
 
-  rownames(mod_cont_cent) <- NULL
+  rownames(mod_cont_cent_df) <- NULL
 
-  mod_cont_cent <- mod_cont_cent %>% relocate(lifepak_id)
+  mod_cont_cent_df <- mod_cont_cent_df %>% relocate(lifepak_id)
   
-  return(mod_cont_cent)
+  # For 7-node networks, restrict to modal controllability centralities of only
+  # "control" or "fun" (depending on which node was included in the network)
+  # and label the centralities as derived from 7-node networks
+  
+  metric <- "mcc"
+  
+  mod_cont_cent_df <- restrict_to_control_fun_and_label_7(mod_cont_cent_df, network_type, metric)
+  
+  return(mod_cont_cent_df)
 }
 
 # Run function
 
-mod_cont_cent_var           <- compute_mod_cont_cent(thres_adj_mats_var)
-mod_cont_cent_var_control   <- compute_mod_cont_cent(thres_adj_mats_var_control)
-mod_cont_cent_var_fun       <- compute_mod_cont_cent(thres_adj_mats_var_fun)
+mod_cont_cent_var           <- compute_mod_cont_cent(thres_adj_mats_var,           "8-node")
+mod_cont_cent_var_control   <- compute_mod_cont_cent(thres_adj_mats_var_control,   "7-node with control")
+mod_cont_cent_var_fun       <- compute_mod_cont_cent(thres_adj_mats_var_fun,       "7-node with fun")
 
-mod_cont_cent_mlvar         <- compute_mod_cont_cent(thres_adj_mats_mlvar)
-mod_cont_cent_mlvar_control <- compute_mod_cont_cent(thres_adj_mats_mlvar_control)
-mod_cont_cent_mlvar_fun     <- compute_mod_cont_cent(thres_adj_mats_mlvar_fun)
-
-# TODO: Address the following code for 8-node VAR network
-
-#compute mean modal controllability centrality of the 2 core depression symptoms (sad and interest)
-results_modal_cont_centrality <- results_modal_cont_centrality %>%
-  rowwise() %>%
-  mutate(m_mcc_sad_int = mean(c(sad_mcc, interest_mcc), na.rm = TRUE)) %>%
-  ungroup()
-
-#merge the data frame with expected influence & other parameters with data frames with average control centrality 
-#and modal control centrality in a single data frame
-all_person_spec_parameters <- all_person_spec_parameters %>%
-  left_join(results_ave_cont_centrality, by = "Participant") %>%
-  left_join(results_modal_cont_centrality, by = "Participant")
-
-# TODO: Address the following code for 8-node ML-VAR network
-
-#compute mean modal controllability centrality of the 2 core depression symptoms (sad and interest)
-results_modal_cont_centrality_mlvar <- results_modal_cont_centrality_mlvar %>%
-  rowwise() %>%
-  mutate(m_mcc_sad_int = mean(c(sad_mcc, interest_mcc), na.rm = TRUE)) %>%
-  ungroup()
-
-#merge the data frame with expected influence & other parameters with data frames with average control centrality and 
-#modal control centrality in a single data frame
-all_person_spec_parameters_mlvar <- all_person_spec_parameters_mlvar %>%
-  left_join(results_ave_cont_centrality_mlvar, by = "Participant") %>%
-  left_join(results_modal_cont_centrality_mlvar, by = "Participant")
-
-
-
-
+mod_cont_cent_mlvar         <- compute_mod_cont_cent(thres_adj_mats_mlvar,         "8-node")
+mod_cont_cent_mlvar_control <- compute_mod_cont_cent(thres_adj_mats_mlvar_control, "7-node with control")
+mod_cont_cent_mlvar_fun     <- compute_mod_cont_cent(thres_adj_mats_mlvar_fun,     "7-node with fun")
 
 # ---------------------------------------------------------------------------- #
-# Computing sums of expected influences ----
+# Compute mean centralities of two core depression symptoms in 8-node networks ----
 # ---------------------------------------------------------------------------- #
 
-# VAR
+# Define function to compute mean of individual centralities for "sad" and "interest"
+# in 8-node VAR and ML-VAR networks
 
-  # Sum of signed outgoing edges connecting perceived agency ("control") to the 2 core depression symptoms ("sad", "interest") for 8-node VAR network
+compute_m_sad_interest <- function(cent_df, metrics) {
+  for (i in 1:length(metrics)) {
+    metric <- metrics[i]
+    
+    sad_name            <- paste0("sad_",            metric)
+    interest_name       <- paste0("interest_",       metric)
+    m_sad_interest_name <- paste0("m_sad_interest_", metric)
+    
+    cent_df[, m_sad_interest_name] <- NA
+    
+    cent_df[, m_sad_interest_name] <- rowMeans(cent_df[, c(sad_name, interest_name)], na.rm = TRUE)
+  }
+  
+  return(cent_df)
+}
 
-sum_outgoing <- results %>%
-  filter(Predictor == "control" & (Criterion == "interest" | Criterion == "sad")) %>% 
-  group_by(Participant) %>%
-  summarise(sum_cont_to_sadint = sum(est, na.rm = TRUE)) %>%
-  mutate(Participant_number = as.numeric(gsub(".*[^0-9]", "", Participant))) %>% #have to sort the "Participant" column according to the numeric suffix
-  arrange(Participant_number) %>%
-  select(-Participant_number)
+# Run function for 8-node VAR and ML-VAR networks
 
-  # Sum of signed outgoing edges connecting positive activity engagement ("fun") to the 2 core depression symptoms ("sad", "interest")
+exp_inf_cent_var    <- compute_m_sad_interest(exp_inf_cent_var,    c("step1", "step2"))
+exp_inf_cent_mlvar  <- compute_m_sad_interest(exp_inf_cent_mlvar,  c("step1", "step2"))
 
-sum_outgoing_1 <- results %>%
-  filter(Predictor == "fun" & (Criterion == "interest" | Criterion == "sad")) %>% 
-  group_by(Participant) %>%
-  summarise(sum_fun_to_sadint = sum(est, na.rm = TRUE)) %>%
-  mutate(Participant_number = as.numeric(gsub(".*[^0-9]", "", Participant))) %>% #have to sort the "Participant" column according to the numeric suffix
-  arrange(Participant_number) %>%
-  select(-Participant_number)
+avg_cont_cent_var   <- compute_m_sad_interest(avg_cont_cent_var,   "acc")
+avg_cont_cent_mlvar <- compute_m_sad_interest(avg_cont_cent_mlvar, "acc")
 
-  #join these two dataframes with rest of parameters
-
-all_person_spec_parameters <- all_person_spec_parameters %>%
-  left_join(sum_outgoing, by = "Participant") %>%
-  left_join(sum_outgoing_1, by = "Participant")
-
-# ML-VAR
-
-  # Sum of signed outgoing edges connecting perceived agency ("control") to the 2 core depression symptoms ("sad", "interest") for 8-node ML-VAR network
-
-sum_outgoing_mlvar <- results_mlvar %>%
-  filter(Predictor == "control" & (Criterion == "interest" | Criterion == "sad")) %>% 
-  group_by(Participant) %>%
-  summarise(sum_cont_to_sadint = sum(est, na.rm = TRUE)) %>%
-  mutate(Participant_number = as.numeric(gsub(".*[^0-9]", "", Participant))) %>% #have to sort the "Participant" column according to the numeric suffix
-  arrange(Participant_number) %>%
-  select(-Participant_number)
-
-  # Sum of signed outgoing edges connecting positive activity engagement ("fun") to the 2 core depression symptoms ("sad", "interest")
-
-sum_outgoing_1_mlvar <- results_mlvar %>%
-  filter(Predictor == "fun" & (Criterion == "interest" | Criterion == "sad")) %>% 
-  group_by(Participant) %>%
-  summarise(sum_fun_to_sadint = sum(est, na.rm = TRUE)) %>%
-  mutate(Participant_number = as.numeric(gsub(".*[^0-9]", "", Participant))) %>% #have to sort the "Participant" column according to the numeric suffix
-  arrange(Participant_number) %>%
-  select(-Participant_number)
-
-  #join these two dataframes with rest of parameters
-
-all_person_spec_parameters_mlvar <- all_person_spec_parameters_mlvar %>%
-  left_join(sum_outgoing_mlvar, by = "Participant") %>%
-  left_join(sum_outgoing_1_mlvar, by = "Participant")
-
-
-
-
+mod_cont_cent_var   <- compute_m_sad_interest(mod_cont_cent_var,   "mcc")
+mod_cont_cent_mlvar <- compute_m_sad_interest(mod_cont_cent_mlvar, "mcc")
 
 # ---------------------------------------------------------------------------- #
-# Computing density ----
+# Compute density in 8-node networks ----
 # ---------------------------------------------------------------------------- #
 
-# VAR (8-node)
+# Define function to compute global expected influence in terms of internode, 
+# intranode, and overall connectivity in 8-node VAR and ML-VAR networks
 
-  #inter-node connectivity 
-
-sum_off_diag <- function(mat) {
-  sum(mat) - sum(diag(mat))
+compute_global_exp_inf <- function(adj_mats) {
+  # Compute internode, intranode, and overall connectivity
+  
+  inter_conn <- sapply(adj_mats, function(x) {
+    sum(c(x[upper.tri(x)],
+          x[lower.tri(x)]))
+  })
+  
+  intra_conn <- sapply(adj_mats, function(x) {
+    sum(diag(x))
+  })
+  
+  overall_conn <- sapply(adj_mats, function(x) {
+    sum(x)
+  })
+  
+  # Combine into data frame
+  
+  global_exp_inf_df <- data.frame(lifepak_id   = names(adj_mats),
+                                  inter_conn   = inter_conn,
+                                  intra_conn   = intra_conn,
+                                  overall_conn = overall_conn)
+  
+  return(global_exp_inf_df)
 }
 
-inter_node_connectivity <- sapply(adjacency_matrices, sum_off_diag)
+# Run function for 8-node VAR and ML-VAR networks
 
-all_person_spec_parameters$`inter-node connectivity` <- inter_node_connectivity
+global_exp_inf_var   <- compute_global_exp_inf(thres_adj_mats_var)
+global_exp_inf_mlvar <- compute_global_exp_inf(thres_adj_mats_mlvar)
 
-  #intra-node connectivity
+# ---------------------------------------------------------------------------- #
+# Compute sums of selected one-step expected influences in 8-node networks  ----
+# ---------------------------------------------------------------------------- #
 
-sum_diag <- function(mat) {
-  sum(diag(mat))
+# Define function to compute (a) sum of signed outgoing edges connecting "control"
+# to two core depression symptoms ("sad" and "interest") and (b) same connecting 
+# "fun" to such symptoms in 8-node VAR and ML-VAR networks
+
+compute_select_exp_inf <- function(adj_mats) {
+  # Compute selected one-step expected influences
+  
+  sum_control_to_sad_interest <- sapply(adj_mats, function(x) {
+    sum(x["control", c("sad", "interest")])
+  })
+  
+  sum_fun_to_sad_interest     <- sapply(adj_mats, function(x) {
+    sum(x["fun",     c("sad", "interest")])
+  })
+  
+  # Combine into data frame
+  
+  select_exp_inf_df <- data.frame(lifepak_id                  = names(adj_mats),
+                                  sum_control_to_sad_interest = sum_control_to_sad_interest,
+                                  sum_fun_to_sad_interest     = sum_fun_to_sad_interest)
+  
+  return(select_exp_inf_df)
 }
 
-all_person_spec_parameters$intra_node_connectivity <- sapply(adjacency_matrices, sum_diag)
+# Run function for 8-node VAR and ML-VAR networks
 
-  #overall connectivity
+select_exp_inf_var   <- compute_select_exp_inf(thres_adj_mats_var)
+select_exp_inf_mlvar <- compute_select_exp_inf(thres_adj_mats_mlvar)
 
-all_person_spec_parameters$overall_connectivity <- sapply(adjacency_matrices, function(mat) sum(mat))
-
-# ML-VAR (8-node)
-
-  #inter-node connectivity 
-
-sum_off_diag <- function(mat) {
-  sum(mat) - sum(diag(mat))
-}
-
-inter_node_connectivity_mlvar <- sapply(adjacency_matrices_mlvar, sum_off_diag)
-
-all_person_spec_parameters_mlvar$`inter-node connectivity` <- inter_node_connectivity_mlvar
-
-  #intra-node connectivity
-
-sum_diag <- function(mat) {
-  sum(diag(mat))
-}
-
-all_person_spec_parameters_mlvar$intra_node_connectivity <- sapply(adjacency_matrices_mlvar, sum_diag)
-
-  #overall connectivity
-
-all_person_spec_parameters_mlvar$overall_connectivity <- sapply(adjacency_matrices_mlvar, function(mat) sum(mat))
-
-
-
-
-
-
-# TODO: Address the following code re expected influence for 7-node VAR network with control
-
-expected_influence_just_control <- expected_influence_control_wide [, c("Participant", "control_step1", "control_step2")]
-
-colnames(expected_influence_just_control) <- c("Participant", "control_step1_7", "control_step2_7")
-
-
-
-
-
-# TODO: Address the following code re average controllability centrality for 7-node VAR network with control
-
-results_ave_cont_centrality_just_control <- results_ave_cont_centrality_control[, c("Participant", "control_acc")]
-
-colnames(results_ave_cont_centrality_just_control) <- c("Participant", "control_acc_7")
-
-
-
-
-
-# TODO: Address the following code re modal controllability centrality for 7-node VAR network with control
-
-results_modal_cont_centrality_just_control <- results_modal_cont_centrality_control[, c("Participant", "control_mcc")]
-
-colnames(results_modal_cont_centrality_just_control) <- c("Participant", "control_mcc_7")
-
-
-
-
-
-# TODO: Address the following code re expected influence for 7-node VAR network with fun
-
-expected_influence_just_fun <- expected_influence_fun_wide [, c("Participant", "fun_step1", "fun_step2")]
-
-colnames (expected_influence_just_fun) <- c("Participant", "fun_step1_7", "fun_step2_7")
-
-
-
-
-
-# TODO: Address the following code re average controllability centrality for 7-node VAR network with fun
-
-results_ave_cont_centrality_just_fun <- results_ave_cont_centrality_fun [, c("Participant", "fun_acc")]
-
-colnames(results_ave_cont_centrality_just_fun) <- c("Participant", "fun_acc_7")
-
-
-
-
-
-# TODO: Address the following code re modal controllability centrality for 7-node VAR network with fun
-
-results_modal_cont_centrality_just_fun <- results_modal_cont_centrality_fun[, c("Participant", "fun_mcc")]
-
-colnames(results_modal_cont_centrality_just_fun) <- c("Participant", "fun_mcc_7")
+# TODO: Condense code below using custom functions
 
 
 
@@ -481,6 +372,18 @@ colnames(results_modal_cont_centrality_just_fun) <- c("Participant", "fun_mcc_7"
 # ---------------------------------------------------------------------------- #
 # Merging the entire data frame with person-specific VAR parameters ----
 # ---------------------------------------------------------------------------- #
+
+#merge the data frame with expected influence & other parameters with data frames with average control centrality 
+#and modal control centrality in a single data frame
+all_person_spec_parameters <- all_person_spec_parameters %>%
+  left_join(results_ave_cont_centrality, by = "Participant") %>%
+  left_join(results_modal_cont_centrality, by = "Participant")
+
+#merge the data frame with expected influence & other parameters with data frames with average control centrality and 
+#modal control centrality in a single data frame
+all_person_spec_parameters_mlvar <- all_person_spec_parameters_mlvar %>%
+  left_join(results_ave_cont_centrality_mlvar, by = "Participant") %>%
+  left_join(results_modal_cont_centrality_mlvar, by = "Participant")
 
 all_person_spec_parameters <- all_person_spec_parameters %>%
   left_join(expected_influence_just_fun, by = "Participant") %>%
@@ -536,65 +439,6 @@ label(all_person_spec_parameters$control_acc_7)   <- "Average controllability ce
 label(all_person_spec_parameters$fun_acc_7)       <- "Average controllability centrality of fun in a 7-node network"
 label(all_person_spec_parameters$control_mcc_7)   <- "Modal controllability centrality of control in a 7-node network"
 label(all_person_spec_parameters$fun_mcc_7)       <- "Modal controllability centrality of fun in a 7-node network"
-
-# ---------------------------------------------------------------------------- #
-# Computing person-specific parameters from the 8-node ML-VAR network ----
-# ---------------------------------------------------------------------------- #
-
-# TODO: Address the following code re expected influence for 7-node ML-VAR network with control
-
-expected_influence_just_mlvar_control <- expected_influence_mlvar_control_wide [, c("Participant", "control_step1", "control_step2")]
-
-colnames(expected_influence_just_mlvar_control) <- c("Participant", "control_step1_7", "control_step2_7")
-
-
-
-
-# TODO: Address the following code re average controllability centrality for 7-node ML-VAR network with control
-
-results_ave_cont_centrality_just_mlvar_control <- results_ave_cont_centrality_mlvar_control[, c("Participant", "control_acc")]
-
-colnames(results_ave_cont_centrality_just_mlvar_control) <- c("Participant", "control_acc_7")
-
-
-
-
-# TODO: Address the following code re modal controllability centrality for 7-node ML-VAR network with control
-
-results_modal_cont_centrality_just_mlvar_control <- results_modal_cont_centrality_mlvar_control[, c("Participant", "control_mcc")]
-
-colnames(results_modal_cont_centrality_just_mlvar_control) <- c("Participant", "control_mcc_7")
-
-
-
-
-# TODO: Address the following code re expected influence for 7-node ML-VAR network with fun
-
-expected_influence_just_mlvar_fun <- expected_influence_mlvar_fun_wide [, c("Participant", "fun_step1", "fun_step2")]
-
-colnames(expected_influence_just_mlvar_fun) <- c("Participant", "fun_step1_7", "fun_step2_7")
-
-
-
-
-# TODO: Address the following code re average controllability centrality for 7-node ML-VAR network with fun
-
-results_ave_cont_centrality_just_mlvar_fun <- results_ave_cont_centrality_mlvar_fun [, c("Participant", "fun_acc")]
-
-colnames(results_ave_cont_centrality_just_mlvar_fun) <- c("Participant", "fun_acc_7")
-
-
-
-
-
-# TODO: Address the following code re modal controllability centrality for 7-node ML-VAR network with fun
-
-results_modal_cont_centrality_just_mlvar_fun <- results_modal_cont_centrality_mlvar_fun[, c("Participant", "fun_mcc")]
-
-colnames(results_modal_cont_centrality_just_mlvar_fun) <- c("Participant", "fun_mcc_7")
-
-
-
 
 # ---------------------------------------------------------------------------- #
 # Merging the entire data frame with person-specific parameters from ML-VAR ----
@@ -669,4 +513,12 @@ colnames(all_person_spec_parameters_mlvar)[colnames(all_person_spec_parameters_m
 all_person_spec_parameters_var_mlvar <- all_person_spec_parameters %>%
   left_join(all_person_spec_parameters_mlvar, by = "Participant")
 
+# ---------------------------------------------------------------------------- #
+# Export network parameters ----
+# ---------------------------------------------------------------------------- #
+
 # TODO: Save parameters as RDS file
+
+
+
+
