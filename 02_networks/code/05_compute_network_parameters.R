@@ -26,15 +26,11 @@ source("./02_networks/code/01_define_functions.R")
 
 groundhog_day <- version_control()
 
-# TODO (Determine which ones are needed): Load packages
+# Load packages
 
 pkgs <- c("dplyr", "tidyr", "Hmisc", "networktools", "netcontrol")
 
 groundhog.library(pkgs, groundhog_day)
-
-
-
-
 
 # ---------------------------------------------------------------------------- #
 # Import extracted results and thresholded adjacency matrices  ----
@@ -367,24 +363,76 @@ select_exp_inf_mlvar <- compute_select_exp_inf(thres_adj_mats_mlvar)
 # Label network parameters and merge into one data frame ----
 # ---------------------------------------------------------------------------- #
 
+# Define function to label network parameters in given data frame
+
+label_net_params <- function(df, target_cols, labels) {
+  for (i in 1:length(target_cols)) {
+    target_col <- target_cols[i]
+    
+    if (length(labels) == 1) {
+      label <- labels
+    } else if (length(labels) == length(target_cols)) {
+      label <- labels[i]
+    }
+    
+    label(df[[target_col]]) <- label
+  }
+  
+  return(df)
+}
+
 # Define function to label network parameters and merge into one data frame
 
-merge_net_params <- function(exp_inf_cent,  exp_inf_cent_control,  exp_inf_cent_fun,
-                             avg_cont_cent, avg_cont_cent_control, avg_cont_cent_fun,
-                             mod_cont_cent, mod_cont_cent_control, mod_cont_cent_fun,
-                             global_exp_inf,
-                             select_exp_inf) {
-  # TODO: Label network parameters
+label_merge_net_params <- function(exp_inf_cent,  exp_inf_cent_control,  exp_inf_cent_fun,
+                                   avg_cont_cent, avg_cont_cent_control, avg_cont_cent_fun,
+                                   mod_cont_cent, mod_cont_cent_control, mod_cont_cent_fun,
+                                   global_exp_inf, select_exp_inf, model_type) {
+  # Label network parameters
   
+  node_vars <- c("bad", "control", "energy", "focus", "fun", "interest", "movement", "sad")
   
+  exp_inf_cent  <- label_net_params(exp_inf_cent,
+                                    paste0(node_vars, "_step1"),
+                                    "one-step expected influence centrality for given node in 8-node network")
+  exp_inf_cent  <- label_net_params(exp_inf_cent,
+                                    paste0(node_vars, "_step2"),
+                                    "two-step expected influence centrality for given node in 8-node network")
   
+  avg_cont_cent <- label_net_params(avg_cont_cent,
+                                    paste0(node_vars, "_acc"),
+                                    "average controllability centrality for given node in 8-node network")
   
+  mod_cont_cent <- label_net_params(mod_cont_cent,
+                                    paste0(node_vars, "_mcc"),
+                                    "model controllability centrality for given node in 8-node network")
   
-  # TODO: Append column names and labels for ML-VAR
+  label(exp_inf_cent$m_sad_interest_step1)          <- "mean of one-step expected influence centralities for sad and interest in 8-node network"
+  label(exp_inf_cent$m_sad_interest_step2)          <- "mean of two-step expected influence centralities for sad and interest in 8-node network"
   
+  label(avg_cont_cent$m_sad_interest_acc)           <- "mean of average controllability centralities for sad and interest in 8-node network"
   
+  label(mod_cont_cent$m_sad_interest_mcc)           <- "mean of modal controllability centralities for sad and interest in 8-node network"
   
+  label(exp_inf_cent_control$control_step1_7)       <- "one-step expected influence centrality for control in 7-node network"
+  label(exp_inf_cent_control$control_step2_7)       <- "two-step expected influence centrality for control in 7-node network"
+    
+  label(exp_inf_cent_fun$fun_step1_7)               <- "one-step expected influence centrality for fun in 7-node network"
+  label(exp_inf_cent_fun$fun_step2_7)               <- "two-step expected influence centrality for fun in 7-node network"
   
+  label(avg_cont_cent_control$control_acc_7)        <- "average controllability centrality for control in 7-node network"
+
+  label(avg_cont_cent_fun$fun_acc_7)                <- "average controllability centrality for fun in 7-node network"
+  
+  label(mod_cont_cent_control$control_mcc_7)        <- "modal controllability centrality for control in 7-node network"
+  
+  label(mod_cont_cent_fun$fun_mcc_7)                <- "modal controllability centrality for fun in 7-node network"
+  
+  label(global_exp_inf$inter_conn)                  <- "global internode expected influence in 8-node network"
+  label(global_exp_inf$intra_conn)                  <- "global intranode expected influence in 8-node network"
+  label(global_exp_inf$overall_conn)                <- "global overall expected influence in 8-node network"
+  
+  label(select_exp_inf$sum_control_to_sad_interest) <- "sum of signed edges from control to sad and interest in 8-node network"
+  label(select_exp_inf$sum_fun_to_sad_interest)     <- "sum of signed edges from fun to sad and interest in 8-node network"
   
   # Merge into one data frame
   
@@ -397,177 +445,57 @@ merge_net_params <- function(exp_inf_cent,  exp_inf_cent_control,  exp_inf_cent_
   merged_df <- Reduce(function(x, y) merge(x, y, by = "lifepak_id", all = TRUE), 
                       dfs)
   
+  merged_df$lifepak_id <- as.integer(merged_df$lifepak_id)
+  
+  merged_df <- merged_df[order(merged_df$lifepak_id), ]
+  
+  row.names(merged_df) <- NULL
+  
+  # Append column names and labels based on model type
+  
+  target_colnames <- names(merged_df)[names(merged_df) != "lifepak_id"]
+  target_labels   <- label(merged_df[target_colnames])
+  
+  if (model_type == "VAR") {
+    suffix <- "_var"
+  } else if (model_type == "ML-VAR") {
+    suffix <- "_mlvar"
+  }
+  
+  new_colnames <- paste0(target_colnames, "_", suffix)
+  new_labels   <- paste(model_type, target_labels)
+  
+  names(merged_df)[names(merged_df) %in% target_colnames] <- new_colnames
+  
+  merged_df <- label_net_params(merged_df, new_colnames, new_labels)
+  
   return(merged_df)
 }
 
-# (TODO: Check the merging) Run function for VAR and ML-VAR network parameters
+# Run function for VAR and ML-VAR network parameters
 
-net_params_var   <- merge_net_params(exp_inf_cent_var,    exp_inf_cent_var_control,    exp_inf_cent_var_fun, 
-                                     avg_cont_cent_var,   avg_cont_cent_var_control,   avg_cont_cent_var_fun, 
-                                     mod_cont_cent_var,   mod_cont_cent_var_control,   mod_cont_cent_var_fun, 
-                                     global_exp_inf_var, 
-                                     select_exp_inf_var)
+net_params_var   <- label_merge_net_params(exp_inf_cent_var,     exp_inf_cent_var_control,    exp_inf_cent_var_fun, 
+                                           avg_cont_cent_var,    avg_cont_cent_var_control,   avg_cont_cent_var_fun, 
+                                           mod_cont_cent_var,    mod_cont_cent_var_control,   mod_cont_cent_var_fun, 
+                                           global_exp_inf_var,   select_exp_inf_var, "VAR")
 
-net_params_mlvar <- merge_net_params(exp_inf_cent_mlvar,  exp_inf_cent_mlvar_control,  exp_inf_cent_mlvar_fun, 
-                                     avg_cont_cent_mlvar, avg_cont_cent_mlvar_control, avg_cont_cent_mlvar_fun, 
-                                     mod_cont_cent_mlvar, mod_cont_cent_mlvar_control, mod_cont_cent_mlvar_fun, 
-                                     global_exp_inf_mlvar, 
-                                     select_exp_inf_mlvar)
-
-
-
-
+net_params_mlvar <- label_merge_net_params(exp_inf_cent_mlvar,   exp_inf_cent_mlvar_control,  exp_inf_cent_mlvar_fun, 
+                                           avg_cont_cent_mlvar,  avg_cont_cent_mlvar_control, avg_cont_cent_mlvar_fun, 
+                                           mod_cont_cent_mlvar,  mod_cont_cent_mlvar_control, mod_cont_cent_mlvar_fun, 
+                                           global_exp_inf_mlvar, select_exp_inf_mlvar, "ML-VAR")
 
 # ---------------------------------------------------------------------------- #
-# Merging the entire data frame with person-specific VAR parameters ----
+# Merge VAR and ML-VAR network parameters into one data frame ----
 # ---------------------------------------------------------------------------- #
 
-#merge the data frame with expected influence & other parameters with data frames with average control centrality 
-#and modal control centrality in a single data frame
-all_person_spec_parameters <- all_person_spec_parameters %>%
-  left_join(results_ave_cont_centrality, by = "Participant") %>%
-  left_join(results_modal_cont_centrality, by = "Participant")
-
-#merge the data frame with expected influence & other parameters with data frames with average control centrality and 
-#modal control centrality in a single data frame
-all_person_spec_parameters_mlvar <- all_person_spec_parameters_mlvar %>%
-  left_join(results_ave_cont_centrality_mlvar, by = "Participant") %>%
-  left_join(results_modal_cont_centrality_mlvar, by = "Participant")
-
-all_person_spec_parameters <- all_person_spec_parameters %>%
-  left_join(expected_influence_just_fun, by = "Participant") %>%
-  left_join(expected_influence_just_control, by = "Participant") %>%
-  left_join(results_ave_cont_centrality_just_control, by = "Participant") %>%
-  left_join(results_modal_cont_centrality_just_control, by = "Participant") %>%
-  left_join(results_ave_cont_centrality_just_fun, by = "Participant") %>%
-  left_join(results_modal_cont_centrality_just_fun, by = "Participant")
-
-# ---------------------------------------------------------------------------- #
-# Labeling columns for person-specific VAR parameters ----
-# ---------------------------------------------------------------------------- #
-
-all_person_spec_parameters <- all_person_spec_parameters %>%
-  mutate_at(vars(bad_step1, control_step1, energy_step1, focus_step1, fun_step1, interest_step1, movement_step1, sad_step1), ~ {
-    label(.) <- "One-step expected influence for a given node"
-    .
-  })
-
-all_person_spec_parameters <- all_person_spec_parameters %>%
-  mutate_at(vars(bad_step2, control_step2, energy_step2, focus_step2, fun_step2, interest_step2, movement_step2, sad_step2), ~ {
-    label(.) <- "Two-step expected influence for a given node"
-    .
-  })
-
-label(all_person_spec_parameters$m_ei_s1_sad_int)    <- "Mean one-step expected influence of sad and interest"
-label(all_person_spec_parameters$m_ei_s2_sad_int)    <- "Mean two-step expected influence of sad and interest"
-label(all_person_spec_parameters$sum_cont_to_sadint) <- "Sum of outgoing edges connecting control to sad and interest"
-label(all_person_spec_parameters$sum_fun_to_sadint)  <- "Sum of outgoing edges connecting fun to sad and interest"
-
-all_person_spec_parameters <- all_person_spec_parameters %>%
-  mutate_at(vars(bad_acc, control_acc, energy_acc, focus_acc, 
-                 fun_acc, interest_acc, movement_acc, sad_acc), ~ {
-                   label(.) <- "Average controllability centrality for a given node"
-                   .
-                 })
-
-label(all_person_spec_parameters$m_acc_sad_int) <- "Mean average controllability centrality of sad and interest"
-
-all_person_spec_parameters <- all_person_spec_parameters %>%
-  mutate_at(vars(bad_mcc, control_mcc, energy_mcc, focus_mcc, 
-                 fun_mcc, interest_mcc, movement_mcc, sad_mcc), ~ {
-                   label(.) <- "Modal controllability centrality for a given node"
-                   .
-                 })
-
-label(all_person_spec_parameters$m_mcc_sad_int)   <- "Mean modal controllability centrality of sad and interest"
-label(all_person_spec_parameters$fun_step1_7)     <- "One-step expected influence of fun in 7-node network"
-label(all_person_spec_parameters$fun_step2_7)     <- "Two-step expected influence of fun in 7-node network"
-label(all_person_spec_parameters$control_step1_7) <- "One-step expected influence of control in 7-node network"
-label(all_person_spec_parameters$control_step2_7) <- "Two-step expected influence of control in 7-node network"
-label(all_person_spec_parameters$control_acc_7)   <- "Average controllability centrality of control in a 7-node network"
-label(all_person_spec_parameters$fun_acc_7)       <- "Average controllability centrality of fun in a 7-node network"
-label(all_person_spec_parameters$control_mcc_7)   <- "Modal controllability centrality of control in a 7-node network"
-label(all_person_spec_parameters$fun_mcc_7)       <- "Modal controllability centrality of fun in a 7-node network"
-
-# ---------------------------------------------------------------------------- #
-# Merging the entire data frame with person-specific parameters from ML-VAR ----
-# ---------------------------------------------------------------------------- #
-
-all_person_spec_parameters_mlvar <- all_person_spec_parameters_mlvar %>%
-  left_join(expected_influence_just_mlvar_fun, by = "Participant") %>%
-  left_join(expected_influence_just_mlvar_control, by = "Participant") %>%
-  left_join(results_ave_cont_centrality_just_mlvar_control, by = "Participant") %>%
-  left_join(results_modal_cont_centrality_just_mlvar_control, by = "Participant") %>%
-  left_join(results_ave_cont_centrality_just_mlvar_fun, by = "Participant") %>%
-  left_join(results_modal_cont_centrality_just_mlvar_fun, by = "Participant")
-
-# ---------------------------------------------------------------------------- #
-# Labeling the columns for person-specific parameters from ML-VAR ----
-# ---------------------------------------------------------------------------- #
-
-all_person_spec_parameters_mlvar <- all_person_spec_parameters_mlvar %>%
-  mutate_at(vars(bad_step1, control_step1, energy_step1, focus_step1, fun_step1, interest_step1, movement_step1, sad_step1), ~ {
-    label(.) <- "ML_VAR One-step expected influence for a given node"
-    .
-  })
-
-all_person_spec_parameters_mlvar <- all_person_spec_parameters_mlvar %>%
-  mutate_at(vars(bad_step2, control_step2, energy_step2, focus_step2, fun_step2, interest_step2, movement_step2, sad_step2), ~ {
-    label(.) <- "ML_VAR Two-step expected influence for a given node"
-    .
-  })
-
-label(all_person_spec_parameters_mlvar$m_ei_s1_sad_int)    <- "ML_VAR Mean one-step expected influence of sad and interest"
-label (all_person_spec_parameters_mlvar$m_ei_s2_sad_int)   <- "ML_VAR Mean two-step expected influence of sad and interest"
-label(all_person_spec_parameters_mlvar$sum_cont_to_sadint) <- "ML_VAR Sum of outgoing edges connecting control to sad and interest"
-label(all_person_spec_parameters_mlvar$sum_fun_to_sadint)  <- "ML_VAR Sum of outgoing edges connecting fun to sad and interest"
-
-all_person_spec_parameters_mlvar <- all_person_spec_parameters_mlvar %>%
-  mutate_at(vars(bad_acc, control_acc, energy_acc, focus_acc, 
-                 fun_acc, interest_acc, movement_acc, sad_acc), ~ {
-                   label(.) <- "ML_VAR Average controllability centrality for a given node"
-                   .
-                 })
-
-label(all_person_spec_parameters_mlvar$m_acc_sad_int) <- "ML_VAR Mean average controllability centrality of sad and interest"
-
-all_person_spec_parameters_mlvar <- all_person_spec_parameters_mlvar %>%
-  mutate_at(vars(bad_mcc, control_mcc, energy_mcc, focus_mcc, 
-                 fun_mcc, interest_mcc, movement_mcc, sad_mcc), ~ {
-                   label(.) <- "ML_VAR Modal controllability centrality for a given node"
-                   .
-                 })
-
-label(all_person_spec_parameters_mlvar$m_mcc_sad_int)   <- "ML_VAR Mean modal controllability centrality of sad and interest"
-label(all_person_spec_parameters_mlvar$fun_step1_7)     <- "ML_VAR One-step expected influence of fun in 7-node network"
-label(all_person_spec_parameters_mlvar$fun_step2_7)     <- "ML_VAR Two-step expected influence of fun in 7-node network"
-label(all_person_spec_parameters_mlvar$control_step1_7) <- "ML_VAR One-step expected influence of control in 7-node network"
-label(all_person_spec_parameters_mlvar$control_step2_7) <- "ML_VAR Two-step expected influence of control in 7-node network"
-label(all_person_spec_parameters_mlvar$control_acc_7)   <- "ML_VAR Average controllability centrality of control in a 7-node network"
-label(all_person_spec_parameters_mlvar$fun_acc_7)       <- "ML_VAR Average controllability centrality of fun in a 7-node network"
-label(all_person_spec_parameters_mlvar$control_mcc_7)   <- "ML_VAR Modal controllability centrality of control in a 7-node network"
-label(all_person_spec_parameters_mlvar$fun_mcc_7)       <- "ML_VAR Modal controllability centrality of fun in a 7-node network"
-
-# ---------------------------------------------------------------------------- #
-# Merging the data frames with person-specific parameters from VAR and person-specific parameters extracted from ML-VAR ----
-# ---------------------------------------------------------------------------- #
-
-#changing the names of all columns in the ML-VAR data frame so that they end with _mlvar
-colnames(all_person_spec_parameters_mlvar) <- paste0(colnames(all_person_spec_parameters_mlvar), "_mlvar")
-
-colnames(all_person_spec_parameters_mlvar)[colnames(all_person_spec_parameters_mlvar) == "Participant_mlvar"] <- "Participant"
-
-#merging the two data frames with person-specific parameters
-
-all_person_spec_parameters_var_mlvar <- all_person_spec_parameters %>%
-  left_join(all_person_spec_parameters_mlvar, by = "Participant")
+net_params_var_mlvar <- merge(net_params_var, net_params_mlvar, by = "lifepak_id", all = TRUE)
 
 # ---------------------------------------------------------------------------- #
 # Export network parameters ----
 # ---------------------------------------------------------------------------- #
 
-# TODO: Save parameters as RDS file
+net_params_path <- "./02_networks/results/net_params/"
 
+dir.create(net_params_path)
 
-
-
+save(net_params_var_mlvar, file = paste0(net_params_path, "net_params_var_mlvar.RDS"))      
