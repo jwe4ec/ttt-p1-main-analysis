@@ -114,10 +114,6 @@ if (!(dir.exists(mplus_var_control_path))) {dir.create(mplus_var_control_path)}
 
 setwd(mplus_var_control_path)
 
-if (!(dir.exists(mplus_var_path))) {dir.create(mplus_var_path)}
-
-setwd(mplus_var_path)
-
 for (i in 1:length(ids)) {
   tmp <- data_var[data_var$lifepak_id == ids[i], 
                   c("bin_no_adj", "bad_d", "control_d", "energy_d", "focus_d", "interest_d", "movement_d", "sad_d")]
@@ -172,7 +168,7 @@ saveRDS(varfit_fun, file = "./02_networks/results/raw/varfit_fun.RDS")
 # Run ML-VAR model using all 8 nodes ----
 # ---------------------------------------------------------------------------- #
 
-varfit <- list()
+mlvarfit <- list()
 
 mplus_mlvar_path <- "./02_networks/results/raw/mplus_mlvar/"
 
@@ -204,7 +200,7 @@ saveRDS(mlvarfit, file = "./02_networks/results/raw/mlvarfit.RDS")
 # Run ML-VAR model using 7 nodes (including "control"; excluding "fun") ----
 # ---------------------------------------------------------------------------- #
 
-varfit <- list()
+mlvarfit_control <- list()
 
 mplus_mlvar_control_path <- "./02_networks/results/raw/mplus_mlvar_control/"
 
@@ -234,7 +230,7 @@ saveRDS(mlvarfit_control, file = "./02_networks/results/raw/mlvarfit_control.RDS
 # Run ML-VAR model using 7 nodes (including "fun"; excluding "control") ----
 # ---------------------------------------------------------------------------- #
 
-varfit <- list()
+mlvarfit_fun <- list()
 
 mplus_mlvar_fun_path <- "./02_networks/results/raw/mplus_mlvar_fun/"
 
