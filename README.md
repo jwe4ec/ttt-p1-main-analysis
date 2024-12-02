@@ -2,6 +2,16 @@
 
 This repository contains analysis code for this project on the Open Science Framework (OSF): [https://osf.io/c4e75/](https://osf.io/c4e75/).
 
+## Table of Contents
+
+- [Centralized Data Cleaning](#centralized-data-cleaning)
+  - [Data](#data)
+  - [Code](#code)
+  - [Other Documentation](#other-documentation)
+  - [TODOs](#todos)
+- [Network Analyses](#network-analyses)
+- [Machine Learning](#machine-learning)
+
 ## Centralized Data Cleaning
 
 Data, initial code, and documentation relevant to centralized data cleaning for Phase I of Project TRACK to TREAT (TTT) are stored in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder on the [FSMResFiles](https://www.feinberg.northwestern.edu/it/services/server-storage-and-data/research-data-storage.html) server at [Northwestern University Feinberg School of Medicine](https://www.feinberg.northwestern.edu/).
@@ -118,7 +128,7 @@ write.csv(example_clean_table, paste0(clean_path, "example_clean_table.csv"))
 - TODO: Clearly reflect what `01_ttt_phase1_qualtrics_cleaning.Rmd` should output (see description of its outputs above for various issues)
 - TODO: Remove extraneous code/comments
 - TODO: Avoid hard-coding practices
-- TODO: Put clean data in `./data/clean` folder on [OSF project](https://osf.io/c4e75/) linked to the present repo
+- TODO: Put deidentified clean data in `./data/clean` folder on [OSF project](https://osf.io/c4e75/) linked to the present repo
 
 
 
@@ -132,12 +142,22 @@ Analyses input cleaned and deidentified LifePak data in `deid_cleaned_lifepak_tt
 
 ### Code
 
-Initial network analyses were run by [Sebastian Castro-Alvarez](https://github.com/secastroal) and Laura
-Bringmann using code in the `from_sebastian/` folder. Analyses were revised by Josip Razum and [Jeremy Eberle](https://github.com/jwe4ec).
+Initial network analyses were run by [Sebastian Castro-Alvarez](https://github.com/secastroal) and [Laura
+Bringmann](https://github.com/LauraBringmann) using code in the `from_sebastian/` folder. Analyses were revised by Josip Razum and [Jeremy Eberle](https://github.com/jwe4ec).
 
-TODO
+*TODO: Jeremy to document scripts*
+
+
+
+
 
 ## Machine Learning
+
+*TODO: Jeremy to update this section*
+
+
+
+
 
 ### Data
 
