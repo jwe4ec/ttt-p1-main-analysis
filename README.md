@@ -2,33 +2,35 @@
 
 This repository contains analysis code for this project on the Open Science Framework (OSF): [https://osf.io/c4e75/](https://osf.io/c4e75/).
 
-## Data Cleaning
+## Centralized Data Cleaning
+
+Data, initial code, and documentation relevant to centralized data cleaning for Phase I of Project TRACK to TREAT (TTT) are stored in the [`MSS/Schleider_Lab/jslab/TRACK to TREAT`](https://www.schleiderlab.org/) folder on the [FSMResFiles](https://www.feinberg.northwestern.edu/it/services/server-storage-and-data/research-data-storage.html) server at [Northwestern University Feinberg School of Medicine](https://www.feinberg.northwestern.edu/).
+
+The initial centralized data cleaning code was drafted by [Michael Mullarkey](https://github.com/mcmullarkey). The Centralized Data Cleaning section of the present repo attempts to improve the code for greater reproducibility. For centralized data cleaning for Phase II of TTT, see the separate repo [ttt-p2-cleaning](https://github.com/jwe4ec/ttt-p2-cleaning).
+
+Former lab staff who contributed to Phase I of TTT include Sharon Chen (research coordinator at the time) and Laura Jans (research assistant at the time).
 
 ### Data
 
 #### Raw
 
-Raw data are stored on the [jslab](https://www.schleiderlab.org/) shared drive.
-
 ##### From Qualtrics
 
-Raw pre-post data are stored in the `:\\TRACK to TREAT\\Data\\Qualtrics Data\\Raw Data` folder, which contains 18 CSV files obtained from Qualtrics via TODO.
-- TODO: How were the files obtained from Qualtrics (just downloaded or was a script used)?
+Raw pre-post data are stored in the `/TRACK to TREAT/Data/Qualtrics Data/Raw Data` folder, which contains 18 CSV files obtained from Qualtrics (per Date Modified file metadata, presumably 6 files were obtained 6/16/20-5/20/21 and 12 files were obtained on 6/18/21). The Qualtrics cleaning script appears to focus on the latter 12 files (see below).
 
 ##### From LifePak
 
-Raw ecological momentary assessment (EMA) data are stored in the `:\TRACK to TREAT\Data\LifePak Raw Data (Do Not Modify)` folder, which contains 10 CSV files obtained from LifePak via TODO.
-- TODO: How were the files obtained from LifePak (just downloaded or was a script used)?
+Raw ecological momentary assessment (EMA) data are stored in the `/TRACK to TREAT/Data/LifePak Raw Data (Do Not Modify)` folder, which contains 10 CSV files obtained from LifePak (per Date Modified file metadata, presumably 8 files were obtained on 4/28/20 and 2 files were obtained on 9/28/21). The LifePak cleaning script appears to focus on the 5 files with `NIS` in the filename (see below); the `/TRACK to TREAT/Data/readme_ttt_p1.docx` file also states that files with `NIS` (which it defines as "notification-initiated survey") in the filename are the data to be used.
 
 #### Clean
 
-TODO
+Outputs of the initial data cleaning code are stored in the `/TRACK to TREAT/Data/Processed Data` folder
 
 ### Code
 
-Qualtrics data were cleaned before LifePak data
+The present repo uses the following scripts from Michael Mullarkey as a starting point for centralized data cleaning. Given that in general the Qualtrics data seem to have been cleaned before the LifePak data (after which each dataset was deidentified), in the present repo the scripts are numbered in the order they are to be run.
 
-#### `ttt_phase1_qualtrics_cleaning.Rmd` or `ttt_phase1_qualtrics_cleaning_fix.Rmd` (not yet on repo)
+#### `01_ttt_phase1_qualtrics_cleaning.Rmd`
 
 Inputs the following 12 raw CSV files (out of the 18 from Qualtrics)
 - `dp5_b_child_p1_numeric.csv`
@@ -45,12 +47,13 @@ Inputs the following 12 raw CSV files (out of the 18 from Qualtrics)
 - `dp5_3m_parent_p1_choice_text.csv`
 
 Also inputs `dp5_p1_scoring.csv`
-- This file, in the `:\\TRACK to TREAT\Code\Cleaning Data` folder, was obtained by Jeremy Eberle from Michael Mullarkey on 10/31/23. Michael stated that he obtained the file from a Google Drive folder owned by Sharon Chen.
+- This file, in the `/TRACK to TREAT/Code/Cleaning Data` folder, was obtained by Jeremy Eberle from Michael Mullarkey on 10/31/23. Michael stated that he obtained the file from a Google Drive folder owned by Sharon Chen.
 
-Outputs (though both are commented out) `yb_lsmh_ids_dates.csv` and `cleaned_qualtrics_ttt_phase_1.csv`. Moreover, `ttt_phase1_qualtrics_cleaning.Rmd` outputs `cleaned_qualtrics_ttt_phase_1_fixed_220604.csv`, whereas `ttt_phase1_qualtrics_cleaning_fix.Rmd` (which has various hard-coded changes) outputs `cleaned_qualtrics_ttt_phase_1_fixed_220606.csv`.
-- TODO: Is `cleaned_qualtrics_ttt_phase_1_fixed_220604.csv` or `cleaned_qualtrics_ttt_phase_1_fixed_220606.csv` ever used later? Seems later scripts just input `cleaned_qualtrics_ttt_phase_1.csv`. Should the later scripts be updated? Isaac said that he recalls revising the cleaning script in May 2022 just to keep a variable that had been deleted or something like that.
+Outputs (though both are commented out) `yb_lsmh_ids_dates.csv` and `cleaned_qualtrics_ttt_phase_1.csv`. Moreover, outputs `cleaned_qualtrics_ttt_phase_1_fixed_220604.csv`, but this does not appear to be used later in data cleaning pipeline (seems later scripts just input `cleaned_qualtrics_ttt_phase_1.csv`)
+- Isaac Ahuvia stated that he recalls revising the cleaning script in May 2022 just to keep a variable that had been deleted or something similar, so `cleaned_qualtrics_ttt_phase_1_fixed_220604.csv` may relate to this. Both this script and a separate script `ttt_phase1_qualtrics_cleaning_fix.Rmd` (which is not on the present repo and which outputs a CSV file with a different date, `cleaned_qualtrics_ttt_phase_1_fixed_220606.csv`) were last modified on the same date (6/6/22).
+- Note: `02_ttt_phase1_lifepak_cleaning.Rmd` below inputs `cleaned_qualtrics_ttt_phase_1.csv` and then overwrites it after correcting some participant IDs
 
-#### `ttt_phase1_lifepak_cleaning.Rmd`
+#### `02_ttt_phase1_lifepak_cleaning.Rmd`
 
 Inputs the following 5 raw CSV files (out of the 10 from LifePak)
 - `3T_P1_V1_NIS_2020_Mar_02.csv`
@@ -59,15 +62,61 @@ Inputs the following 5 raw CSV files (out of the 10 from LifePak)
 - `3T_P1_V2_NIS_21200_958251_Download3.csv`
 - `3T_P1_V4_NIS.csv`
 
-Also inputs `cleaned_qualtrics_ttt_phase_1.csv`
+Also inputs `cleaned_qualtrics_ttt_phase_1.csv` (presumably originally from `01_ttt_phase1_qualtrics_cleaning.Rmd`)
 
-Outputs `cleaned_combined_qualtrics_lifepak_ttt_phase_1.csv`, `cleaned_lifepak_ttt_phase_1.csv`, and `cleaned_qualtrics_ttt_phase_1.csv`
+Outputs `cleaned_combined_qualtrics_lifepak_ttt_phase_1.csv` (does not appear to be used later in data cleaning pipeline), `cleaned_lifepak_ttt_phase_1.csv`, and `cleaned_qualtrics_ttt_phase_1.csv`
 
-#### `deid_ttt_phase_1.Rmd`
+#### `03_deid_ttt_phase_1.Rmd`
 
-Inputs cleaned LifePak data in `cleaned_lifepak_ttt_phase_1.csv` and cleaned Qualtrics data in `cleaned_qualtrics_ttt_phase_1.csv`
+Inputs cleaned LifePak data (`cleaned_lifepak_ttt_phase_1.csv`) and cleaned Qualtrics data (`cleaned_qualtrics_ttt_phase_1.csv`)
 
-Outputs deidentified data in `deid_cleaned_lifepak_ttt_phase_1.csv` and `deid_cleaned_qualtrics_ttt_phase_1.csv`
+Outputs deidentified data (`deid_cleaned_lifepak_ttt_phase_1.csv` and `deid_cleaned_qualtrics_ttt_phase_1.csv`)
+
+### Other Documentation
+
+The following files in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder appear relevant to data cleaning
+
+#### General
+
+- "TRACK to TREAT/Data/readme_ttt_p1.docx"
+- "TRACK to TREAT/Data/Processed Data/README.rtf"
+
+#### LifePak
+
+- "TRACK to TREAT/Data/3TP1_LifePak_Version_IDs.xlsx"
+- "TRACK to TREAT/Data/README info from Laura Jans/" folder
+  - See contents of this folder for info from Laura Jans re (a) 7 participants who have LifePak data for fewer than the expected number of beeps (see yellow highlights in `2024.04.03 Email with Laura Jans re EMA slider and missing EMA data.pdf` and (b) whether EMA slider items could be skipped (see orange highlights).
+  - For the main TTT paper, these data are simply treated as missing (see `02_networks/code/02_further_clean_data_align_obs.R` in the present repo)
+
+### TODOs
+
+- TODO: Determine what R version and package versions should be used for each script
+  - `01_ttt_phase1_qualtrics_cleaning.Rmd` lists 6/17/2021 as the Date, and `02_ttt_phase1_lifepak_cleaning.Rmd` lists 9/28/2021 as the Date. The output files `cleaned_qualtrics_ttt_phase_1.csv` and `cleaned_lifepak_ttt_phase_1.csv` have Date Modified metadata of 1/7/22. Thus, the scripts used R and package versions prior to these dates.
+  - Note: Michael stated that he cannot guarantee he always used the most up-to-date packages, but he endorsed using these dates as a starting point for determining which R and package versions he used.
+- TODO: Determine what packages are needed, load only those needed, and load all needed packages at top of script
+  - Although many packages are loaded, only a few appear used by each script:
+```
+# "01_ttt_phase1_qualtrics_cleaning.Rmd" packages: "tidyverse", "glue", "janitor", "fastDummies", "diffdf", "datapasta", "fuzzyjoin"
+# "02_ttt_phase1_lifepak_cleaning.Rmd" packages:   "tidyverse", "skimr", "glue", "janitor"
+```
+  - Moreover, one of the loaded packages (`doMC`, related to parallelization) is Unix only and unavailable for Windows
+  - Some packages (`datapasta`, `fuzzyjoin`) are loaded partway through script rather than at top
+- TODO: Remove parallelization, as it does not seem needed
+- TODO: Treating `.` as the parent folder for the present repo, create local raw data folders (`./data/raw/qualtrics` and `./data/raw/lifepak`), put raw CSV files in those folders, and use relative file paths to load raw data and output clean data (vs. storing raw data, clean data, and code in same folder)--see below for example. We can then describe the directory structure in this README.
+```
+example_raw_table <- read.csv("./data/raw/qualtrics/example_raw_table.csv")
+
+clean_path <- "./data/clean/"
+dir.create(clean_path)
+write.csv(example_clean_table, paste0(clean_path, "example_clean_table.csv"))
+```
+- TODO: Load `dp5_p1_scoring.csv` at top of `01_ttt_phase1_qualtrics_cleaning.Rmd` (vs. partway through script)
+- TODO: Remove extraneous code/comments
+- TODO: Avoid hard-coding practices
+
+
+
+
 
 ## Network Analyses
 
