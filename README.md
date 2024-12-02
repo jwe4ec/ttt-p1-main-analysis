@@ -145,7 +145,7 @@ Analyses input cleaned and deidentified LifePak data in `deid_cleaned_lifepak_tt
 Initial network analyses were run by [Sebastian Castro-Alvarez](https://github.com/secastroal) and [Laura
 Bringmann](https://github.com/LauraBringmann) using code in the `from_sebastian/` folder. Analyses were revised by Josip Razum and [Jeremy Eberle](https://github.com/jwe4ec).
 
-*TODO: Jeremy to document scripts*
+**TODO: Jeremy to document scripts**
 
 
 
@@ -153,7 +153,7 @@ Bringmann](https://github.com/LauraBringmann) using code in the `from_sebastian/
 
 ## Machine Learning
 
-*TODO: Jeremy to update this section*
+**TODO: Jeremy to update this section**
 
 
 
