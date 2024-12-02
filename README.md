@@ -6,11 +6,9 @@ This repository contains analysis code for this project on the Open Science Fram
 
 Data, initial code, and documentation relevant to centralized data cleaning for Phase I of Project TRACK to TREAT (TTT) are stored in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder on the [FSMResFiles](https://www.feinberg.northwestern.edu/it/services/server-storage-and-data/research-data-storage.html) server at [Northwestern University Feinberg School of Medicine](https://www.feinberg.northwestern.edu/).
 
-The initial centralized data cleaning code was drafted by [Michael Mullarkey](https://github.com/mcmullarkey). The Centralized Data Cleaning section of the present repo houses [Jeremy Eberle](https://github.com/jwe4ec) and [Isaac Ahuvia](https://github.com/isaacahuvia)'s attempts to improve the code for greater reproducibility.
+The initial centralized data cleaning code was drafted by [Michael Mullarkey](https://github.com/mcmullarkey). The Centralized Data Cleaning section of the present repo houses [Jeremy Eberle](https://github.com/jwe4ec) and [Isaac Ahuvia](https://github.com/isaacahuvia)'s attempts to improve the code for greater reproducibility. For centralized data cleaning for Phase II of TTT, see the separate repo [ttt-p2-cleaning](https://github.com/jwe4ec/ttt-p2-cleaning).
 
 Former lab staff who contributed to Phase I of TTT include Sharon Chen (research coordinator at the time) and Laura Jans (research assistant at the time).
-
-For centralized data cleaning for Phase II of TTT, see the separate repo [ttt-p2-cleaning](https://github.com/jwe4ec/ttt-p2-cleaning).
 
 ### Data
 
@@ -30,7 +28,7 @@ Outputs of the initial data cleaning code are stored in the `/TRACK to TREAT/Dat
 
 ### Code
 
-The present repo uses the following scripts from the `/TRACK to TREAT/Code/Cleaning Data` folder as a starting point for centralized data cleaning. Given that in general the Qualtrics data seem to have been cleaned before the LifePak data (after which each dataset was deidentified), in the present repo the scripts have been numbered in the order to be run.
+The present repo uses the following scripts from the `/TRACK to TREAT/Code/Cleaning Data` folder as a starting point for centralized data cleaning. Given that in general the Qualtrics data seem to have been cleaned before the LifePak data (after which each dataset was deidentified), in this repo the scripts have been numbered in the order to be run.
 
 #### `01_ttt_phase1_qualtrics_cleaning.Rmd`
 
@@ -61,11 +59,11 @@ Outputs (though both are commented out) `yb_lsmh_ids_dates.csv` and `cleaned_qua
 
 Inputs the following 5 raw CSV files (out of the 10 from LifePak)
 ```
-"3T_P1_V1_NIS_2020_Mar_02.csv"
-"3T_P1_V2_NIS_2020_Mar_13.csv"
-"3T_P1_V2_NIS_21200_958251_Download2.csv"
-"3T_P1_V2_NIS_21200_958251_Download3.csv"
-"3T_P1_V4_NIS.csv"
+# "3T_P1_V1_NIS_2020_Mar_02.csv"
+# "3T_P1_V2_NIS_2020_Mar_13.csv"
+# "3T_P1_V2_NIS_21200_958251_Download2.csv"
+# "3T_P1_V2_NIS_21200_958251_Download3.csv"
+# "3T_P1_V4_NIS.csv"
 ```
 
 Also inputs `cleaned_qualtrics_ttt_phase_1.csv` (presumably originally from `01_ttt_phase1_qualtrics_cleaning.Rmd`)
@@ -100,22 +98,22 @@ The following files in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder appea
   - `01_ttt_phase1_qualtrics_cleaning.Rmd` lists 6/17/2021 as the Date; `02_ttt_phase1_lifepak_cleaning.Rmd` lists 9/28/2021 as the Date. The output files `cleaned_qualtrics_ttt_phase_1.csv` and `cleaned_lifepak_ttt_phase_1.csv` have Date Modified metadata of 1/7/22. Thus, the scripts used R and package versions prior to these dates.
   - Note: Michael stated that he cannot guarantee he always used the most up-to-date packages, but he endorsed using these dates as a starting point for determining which R and package versions he used
 - TODO: Determine what packages are needed, load only those, and load all needed packages at top of script
-  - Although many packages are loaded, only a few appear used by each script:
-  ```
-# "01_ttt_phase1_qualtrics_cleaning.Rmd" packages: "tidyverse", "glue", "janitor", "fastDummies", "diffdf", "datapasta", "fuzzyjoin"
-# "02_ttt_phase1_lifepak_cleaning.Rmd" packages:   "tidyverse", "skimr", "glue", "janitor"
-  ```
+  - Although many packages are loaded, only a few appear used by each script (see lists below)
   - Moreover, one of the loaded packages (`doMC`, for parallelization) is Unix only and unavailable for Windows
   - Some packages (`datapasta`, `fuzzyjoin`) are loaded partway through script rather than at top
+```
+# "01_ttt_phase1_qualtrics_cleaning.Rmd" packages: "tidyverse", "glue", "janitor", "fastDummies", "diffdf", "datapasta", "fuzzyjoin"
+# "02_ttt_phase1_lifepak_cleaning.Rmd" packages:   "tidyverse", "skimr", "glue", "janitor"
+```
 - TODO: Remove parallelization, as it does not seem needed
 - TODO: Treating `.` as the parent folder for the present repo, create local raw data folders (`./data/raw/qualtrics` and `./data/raw/lifepak`), put raw CSV files in those folders, and use relative file paths to load raw data and output clean data (vs. storing raw data, clean data, and code in same folder)--see below for example. We can then describe the directory structure in this README.
-   ```
+```
 example_raw_table <- read.csv("./data/raw/qualtrics/example_raw_table.csv")
 
 clean_path <- "./data/clean/"
 dir.create(clean_path)
 write.csv(example_clean_table, paste0(clean_path, "example_clean_table.csv"))
-   ```
+```
 - TODO: Load `dp5_p1_scoring.csv` at top of `01_ttt_phase1_qualtrics_cleaning.Rmd` (vs. partway through script)
 - TODO: Clearly reflect what `01_ttt_phase1_qualtrics_cleaning.Rmd` should output (see description of its outputs above for various issues)
 - TODO: Remove extraneous code/comments
