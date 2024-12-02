@@ -4,6 +4,7 @@ This repository contains analysis code for this project on the Open Science Fram
 
 ## Table of Contents
 
+- [Project Overview](#project-overview)
 - [Centralized Data Cleaning](#centralized-data-cleaning)
   - [Data](#data)
   - [Code](#code)
@@ -11,6 +12,10 @@ This repository contains analysis code for this project on the Open Science Fram
   - [TODOs](#todos)
 - [Network Analyses](#network-analyses)
 - [Machine Learning](#machine-learning)
+
+## Project Overview
+
+Phase I of Project TRACK to TREAT aims to use parameters from network models estimated from ecological momentary assessment (EMA) data to predict 3-month changes in depression symptoms and related constructs in depressed adolescents. Phase I, an observational study, consisted of a baseline Qualtrics survey, 21 days of EMA (5 pings per day), and another Qualtrics survey 3 months later.
 
 ## Centralized Data Cleaning
 
@@ -26,7 +31,7 @@ Former lab staff who contributed to Phase I of TTT include Sharon Chen (research
 
 ##### From Qualtrics
 
-Raw baseline and 3-month data are stored in the `/TRACK to TREAT/Data/Qualtrics Data/Raw Data` folder, which contains 18 CSV files obtained from Qualtrics (per Date Modified file metadata, presumably 6 files were obtained 6/16/20-5/20/21 and 12 files were obtained on 6/18/21). The Qualtrics cleaning script appears to focus on the latter 12 files (see below).
+Raw baseline and 3-month survey data are stored in the `/TRACK to TREAT/Data/Qualtrics Data/Raw Data` folder, which contains 18 CSV files obtained from Qualtrics (per Date Modified file metadata, presumably 6 files were obtained 6/16/20-5/20/21 and 12 files were obtained on 6/18/21). The Qualtrics cleaning script appears to focus on the latter 12 files (see below).
 
 ##### From LifePak
 
