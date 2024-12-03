@@ -140,7 +140,11 @@ write.csv(example_clean_table, paste0(clean_path, "example_clean_table.csv"))
 - TODO: Load `dp5_p1_scoring.csv` at top of `01_ttt_phase1_qualtrics_cleaning.Rmd` (vs. partway through script)
 - TODO: Clearly reflect what `01_ttt_phase1_qualtrics_cleaning.Rmd` should output (see description of its outputs above for various issues)
 - TODO: Remove extraneous code/comments
-- TODO: Avoid hard-coding practices
+- TODO: Avoid hard-coding (e.g., use specific LifePak filenames rather than the code below in Lines 103-109 of `02_ttt_phase1_lifepak_cleaning`)
+```
+files <- list.files(pattern = "*.csv")
+lifepak_files <- files[c(1:5)]
+```
 - TODO: Put deidentified clean data in `./data/clean` folder on [OSF project](https://osf.io/c4e75/) linked to the present repo
 
 
