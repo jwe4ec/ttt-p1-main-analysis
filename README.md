@@ -119,11 +119,11 @@ The following files in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder appea
 - TODO: Determine what R version and package versions should be used for each script
   - `01_ttt_phase1_qualtrics_cleaning.Rmd` lists 6/17/2021 as the Date; `02_ttt_phase1_lifepak_cleaning.Rmd` lists 9/28/2021 as the Date. The output files `cleaned_qualtrics_ttt_phase_1.csv` and `cleaned_lifepak_ttt_phase_1.csv` have Date Modified metadata of 1/7/22. Thus, the scripts used R and package versions prior to these dates.
   - Note: Michael stated that he cannot guarantee he always used the most up-to-date packages, but he endorsed using these dates as a starting point for determining which R and package versions he used
+  - Also find way to control version of `knitr` (needed for Rmd files) or do not use Rmd files (see issue above)
 - TODO: Determine what packages are needed, load only those, and load all needed packages at top of script
   - Although many packages are loaded, only a few appear used by each script (see lists below)
   - Moreover, one of the loaded packages (`doMC`, for parallelization) is Unix only and unavailable for Windows
   - Some packages (`datapasta`, `fuzzyjoin`) are loaded partway through script rather than at top
-  - Find a way to control the version of `knitr` (needed for Rmd files) or do not use Rmd files (see issue above)
 ```
 # "01_ttt_phase1_qualtrics_cleaning.Rmd" packages: "tidyverse", "glue", "janitor", "fastDummies", "diffdf", "datapasta", "fuzzyjoin"
 # "02_ttt_phase1_lifepak_cleaning.Rmd" packages:   "tidyverse", "skimr", "glue", "janitor"
