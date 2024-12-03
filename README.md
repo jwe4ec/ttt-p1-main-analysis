@@ -1,6 +1,6 @@
 # ttt-p1-main-analysis
 
-This repository contains analysis code for this project on the Open Science Framework (OSF): [https://osf.io/c4e75/](https://osf.io/c4e75/).
+This repository contains code for centralized data cleaning and the main paper for Phase I of Project TRACK to TREAT. The repo is linked to this project on the Open Science Framework (OSF): [https://osf.io/c4e75/](https://osf.io/c4e75/).
 
 ## Table of Contents
 
