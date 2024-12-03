@@ -123,7 +123,7 @@ The following files in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder appea
   - Although many packages are loaded, only a few appear used by each script (see lists below)
   - Moreover, one of the loaded packages (`doMC`, for parallelization) is Unix only and unavailable for Windows
   - Some packages (`datapasta`, `fuzzyjoin`) are loaded partway through script rather than at top
-  - Try to find a way to control the version of `knitr` (needed for Rmd files) or do not use an Rmd file (see issue above)
+  - Find a way to control the version of `knitr` (needed for Rmd files) or do not use Rmd files (see issue above)
 ```
 # "01_ttt_phase1_qualtrics_cleaning.Rmd" packages: "tidyverse", "glue", "janitor", "fastDummies", "diffdf", "datapasta", "fuzzyjoin"
 # "02_ttt_phase1_lifepak_cleaning.Rmd" packages:   "tidyverse", "skimr", "glue", "janitor"
