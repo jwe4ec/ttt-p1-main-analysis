@@ -35,7 +35,7 @@ Raw baseline and 3-month survey data are stored in the `/TRACK to TREAT/Data/Qua
 
 ##### From LifePak
 
-Raw ecological momentary assessment (EMA) data are stored in the `/TRACK to TREAT/Data/LifePak Raw Data (Do Not Modify)` folder, which contains 10 CSV files obtained from LifePak (per Date Modified file metadata, presumably 8 files were obtained on 4/28/20 and 2 files were obtained on 9/28/21). The LifePak cleaning script appears to focus on the 5 files with `NIS` in the filename (see below); the `/TRACK to TREAT/Data/readme_ttt_p1.docx` file also states that files with `NIS` (which it defines as "notification-initiated survey") in the filename are the data to be used.
+Raw EMA data are stored in the `/TRACK to TREAT/Data/LifePak Raw Data (Do Not Modify)` folder, which contains 10 CSV files obtained from LifePak (per Date Modified file metadata, presumably 8 files were obtained on 4/28/20 and 2 files were obtained on 9/28/21). The LifePak cleaning script appears to focus on the 5 files with `NIS` in the filename (see below); the `/TRACK to TREAT/Data/readme_ttt_p1.docx` file also states that files with `NIS` (which it defines as "notification-initiated survey") in the filename are the data to be used.
 
 #### Clean
 
@@ -109,6 +109,13 @@ The following files in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder appea
 
 ### TODOs
 
+#### General
+
+- TODO: As of 12/3/24, Jeremy is able to reproduce `cleaned_lifepak_ttt_phase_1.csv` (and `deid_cleaned_lifepak_ttt_phase_1.csv`) per `identical(x, y, FALSE, FALSE, FALSE, FALSE)`. However, he is unable to reproduce `cleaned_qualtrics_ttt_phase_1.csv`.
+  - Specifically, he is able to reproduce the clean LifePak data when using R 4.1.1 (latest version available on 9/28/21; see below) and the most recent versions of `tidyverse`, `skimr`, `glue`, and `janitor` on 12/3/24 (loaded via `library()`). He tried to use the `groundhog` package to load the latest available package versions on 1/7/22 (date that output files were saved to server; see below) but could not use `groundhog` to install `tidyverse` because `tidyverse` depends on `knitr`, which is already in use given that it is used to execute Rmd files.
+
+#### Specific
+
 - TODO: Determine what R version and package versions should be used for each script
   - `01_ttt_phase1_qualtrics_cleaning.Rmd` lists 6/17/2021 as the Date; `02_ttt_phase1_lifepak_cleaning.Rmd` lists 9/28/2021 as the Date. The output files `cleaned_qualtrics_ttt_phase_1.csv` and `cleaned_lifepak_ttt_phase_1.csv` have Date Modified metadata of 1/7/22. Thus, the scripts used R and package versions prior to these dates.
   - Note: Michael stated that he cannot guarantee he always used the most up-to-date packages, but he endorsed using these dates as a starting point for determining which R and package versions he used
@@ -116,6 +123,7 @@ The following files in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder appea
   - Although many packages are loaded, only a few appear used by each script (see lists below)
   - Moreover, one of the loaded packages (`doMC`, for parallelization) is Unix only and unavailable for Windows
   - Some packages (`datapasta`, `fuzzyjoin`) are loaded partway through script rather than at top
+  - Try to find a way to control the version of `knitr` (needed for Rmd files) or do not use an Rmd file (see issue above)
 ```
 # "01_ttt_phase1_qualtrics_cleaning.Rmd" packages: "tidyverse", "glue", "janitor", "fastDummies", "diffdf", "datapasta", "fuzzyjoin"
 # "02_ttt_phase1_lifepak_cleaning.Rmd" packages:   "tidyverse", "skimr", "glue", "janitor"
