@@ -111,8 +111,8 @@ The following files in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder appea
 
 #### General
 
-- TODO: As of 12/3/24, Jeremy is able to reproduce `cleaned_lifepak_ttt_phase_1.csv` (and `deid_cleaned_lifepak_ttt_phase_1.csv`) per `identical(x, y, FALSE, FALSE, FALSE, FALSE)`. However, he is unable to reproduce `cleaned_qualtrics_ttt_phase_1.csv`.
-  - Specifically, he is able to reproduce the clean LifePak data when using R 4.1.1 (latest version available on 9/28/21; see below) and the most recent versions of `tidyverse`, `skimr`, `glue`, and `janitor` on 12/3/24 (loaded via `library()`). He tried to use the `groundhog` package to load the latest available package versions on 1/7/22 (date that output files were saved to server; see below) but could not use `groundhog` to install `tidyverse` because `tidyverse` depends on `knitr`, which is already in use given that it is used to execute Rmd files.
+- TODO: As of 12/3/24, Jeremy can reproduce `cleaned_lifepak_ttt_phase_1.csv` (and `deid_cleaned_lifepak_ttt_phase_1.csv`) per `identical(x, y, FALSE, FALSE, FALSE, FALSE)`. However, he cannot reproduce `cleaned_qualtrics_ttt_phase_1.csv`.
+  - Specifically, he can reproduce the clean LifePak data when using R 4.1.1 (latest version available on 9/28/21; see below) and the most recent versions of `tidyverse`, `skimr`, `glue`, and `janitor` available on 12/3/24 (loaded via `library()`). He tried to use the `groundhog` package to load the latest available package versions on 1/7/22 (date that output files were saved to server; see below) but could not use `groundhog` to install `tidyverse` because `tidyverse` depends on `knitr`, which is "already in use" as it is used to execute Rmd files.
 
 #### Specific
 
