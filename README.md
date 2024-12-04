@@ -160,7 +160,7 @@ Analyses input cleaned and deidentified LifePak data in `deid_cleaned_lifepak_tt
 ### Code
 
 Initial network analyses were run by [Sebastian Castro-Alvarez](https://github.com/secastroal) and [Laura
-Bringmann](https://github.com/LauraBringmann) using code in the `from_sebastian/` folder. Analyses were revised by Josip Razum and [Jeremy Eberle](https://github.com/jwe4ec).
+Bringmann](https://github.com/LauraBringmann) using code in TODO. Analyses were revised by Josip Razum and [Jeremy Eberle](https://github.com/jwe4ec).
 
 **TODO: Jeremy to document scripts**
 
@@ -179,26 +179,19 @@ Bringmann](https://github.com/LauraBringmann) using code in the `from_sebastian/
 ### Data
 
 Analyses input cleaned (but not deidentified) LifePak data in `cleaned_lifepak_ttt_phase_1.csv` and cleaned (but not deidentified) Qualtrics data in `cleaned_qualtrics_ttt_phase_1.csv`.
-- TODO: Consider updating `ttt_phase_1_main_analyses_08232023_final.Rmd` to input deidentified data in `deid_cleaned_lifepak_ttt_phase_1.csv` and `deid_cleaned_qualtrics_ttt_phase_1.csv`
+- TODO: Consider revising code to import deidentified data instead)
 
 ### Code
 
 Initial machine learning analyses were run by [Michael Mullarkey](https://github.com/mcmullarkey) using
 code located at TODO. Analyses were revised by [Yama Chang](https://github.com/yamachang).
 
-**TODO: Compare with updated code Yama sent on 8/1/24**
+#### Michael's
+
+**TODO: Compare code on server with code on Michael's [ttt-main-analyses](https://github.com/mcmullarkey/ttt_main_analyses) repo to help determine if code on server is Michael's original code**
+- See `R:\MSS\Schleider_Lab\jslab\TRACK to TREAT\Code\Primary Analyses`
+
+#### Yama's
+
+**TODO: Process and describe Yama's latest code in folder below**
 - See `R:\MSS\Schleider_Lab\jslab\TRACK to TREAT\Code\Primary Analyses\2024.08.01 From Yama Chang`
-
-#### `ttt_phase_1_main_analyses_08232023_final.Rmd` (in progress and not yet on repo)
-
-Inputs `cleaned_lifepak_ttt_phase_1.csv`, `cleaned_qualtrics_ttt_phase_1.csv`, and `extracted_features_r.csv`
-- TODO: Where is `extracted_features_r.csv` created?
-
-Outputs (though all are commented out) `train_long_ema.csv`, `cdi_data_init.csv`, and `analytical_base_table.csv`
-
-#### `Extract feature.ipynb` (in progress and not yet on repo)
-
-Inputs `train_long_ema.csv`, `test_long_ema.csv`, and `extracted_features_r.csv`
-- TODO: Where are `test_long_ema.csv` and `extracted_features_r.csv` created?
-
-Outputs `extracted_features_train_0908.csv` and `extracted_features_test_0908.csv`
