@@ -186,6 +186,9 @@ Analyses input cleaned (but not deidentified) LifePak data in `cleaned_lifepak_t
 Initial machine learning analyses were run by [Michael Mullarkey](https://github.com/mcmullarkey) using
 code located at TODO. Analyses were revised by [Yama Chang](https://github.com/yamachang).
 
+**TODO: Compare with updated code Yama sent on 8/1/24**
+- See `R:\MSS\Schleider_Lab\jslab\TRACK to TREAT\Code\Primary Analyses\2024.08.01 From Yama Chang`
+
 #### `ttt_phase_1_main_analyses_08232023_final.Rmd` (in progress and not yet on repo)
 
 Inputs `cleaned_lifepak_ttt_phase_1.csv`, `cleaned_qualtrics_ttt_phase_1.csv`, and `extracted_features_r.csv`
