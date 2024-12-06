@@ -153,6 +153,7 @@ write.csv(example_clean_table, paste0(clean_path, "example_clean_table.csv"))
 files <- list.files(pattern = "*.csv")
 lifepak_files <- files[c(1:5)]
 ```
+- TODO: Consider checking for data quality (e.g., see Exclusion Criteria from Phase II [study registration](https://clinicaltrials.gov/study/NCT04607902))
 - TODO: Put deidentified clean data in `./data/clean` folder on [OSF project](https://osf.io/c4e75/) linked to the present repo
 
 
