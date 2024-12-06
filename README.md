@@ -154,6 +154,9 @@ files <- list.files(pattern = "*.csv")
 lifepak_files <- files[c(1:5)]
 ```
 - TODO: Consider checking for data quality (e.g., see Exclusion Criteria from Phase II [study registration](https://clinicaltrials.gov/study/NCT04607902))
+  - Obvious lack of English fluency in open response questions
+  - Responding with random text in open response questions
+  - Duplicate responses from the same individual in baseline or follow-up surveys
 - TODO: Put deidentified clean data in `./data/clean` folder on [OSF project](https://osf.io/c4e75/) linked to the present repo
 
 
