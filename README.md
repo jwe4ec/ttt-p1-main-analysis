@@ -23,13 +23,21 @@ Data, initial code, and documentation relevant to centralized data cleaning for 
 
 The initial centralized data cleaning code was drafted by [Michael Mullarkey](https://github.com/mcmullarkey). The Centralized Data Cleaning section of the present repo houses [Jeremy Eberle](https://github.com/jwe4ec) and [Isaac Ahuvia](https://github.com/isaacahuvia)'s attempts to improve the code for greater reproducibility. For centralized data cleaning for Phase II of TTT, see the separate repo [ttt-p2-cleaning](https://github.com/jwe4ec/ttt-p2-cleaning).
 
-Former lab staff who contributed to Phase I of TTT include Sharon Chen (research coordinator at the time) and Laura Jans (research assistant at the time).
+Lab staff who contributed to Phase I of TTT include former research coordinators Sharon Leong (formerly Chen) and Akash Shroff, and Laura Jans (research assistant at the time).
 
 ### Data
+
+Data collection is complete.
 
 #### Raw
 
 ##### From Qualtrics
+
+###### Screening Survey
+
+TODO
+
+###### Study Surveys
 
 Raw baseline and 3-month survey data are stored in the `/TRACK to TREAT/Data/Qualtrics Data/Raw Data` folder, which contains 18 CSV files obtained from Qualtrics (per Date Modified file metadata, presumably 6 files were obtained 6/16/20-5/20/21 and 12 files were obtained on 6/18/21). The Qualtrics cleaning script appears to focus on the latter 12 files (see below).
 
