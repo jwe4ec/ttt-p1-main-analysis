@@ -15,11 +15,11 @@ This repository contains code for centralized data cleaning and the main paper f
 
 ## Project Overview
 
-Phase I of Project TRACK to TREAT aims to use parameters from network models estimated from ecological momentary assessment (EMA) data to predict 3-month changes in depression symptoms and related constructs in depressed adolescents. Phase I, an observational study, consisted of a baseline Qualtrics survey, 21 days of EMA (5 pings per day), and another Qualtrics survey 3 months later.
+Phase I of Project TRACK to TREAT (TTT) aims to use parameters from network models estimated from ecological momentary assessment (EMA) data to predict 3-month changes in depression symptoms and related constructs in depressed adolescents. Phase I, an observational study, consisted of a baseline Qualtrics survey, 21 days of EMA (5 pings per day), and another Qualtrics survey 3 months later.
 
 ## Centralized Data Cleaning
 
-Data, initial code, and documentation relevant to centralized data cleaning for Phase I of Project TRACK to TREAT (TTT) are stored in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder on the [FSMResFiles](https://www.feinberg.northwestern.edu/it/services/server-storage-and-data/research-data-storage.html) server at [Northwestern University Feinberg School of Medicine](https://www.feinberg.northwestern.edu/).
+Data, initial code, and documentation relevant to centralized data cleaning for Phase I of TTT are stored in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder on the [FSMResFiles](https://www.feinberg.northwestern.edu/it/services/server-storage-and-data/research-data-storage.html) server at [Northwestern University Feinberg School of Medicine](https://www.feinberg.northwestern.edu/).
 
 The initial centralized data cleaning code was drafted by [Michael Mullarkey](https://github.com/mcmullarkey). The Centralized Data Cleaning section of the present repo houses [Jeremy Eberle](https://github.com/jwe4ec) and [Isaac Ahuvia](https://github.com/isaacahuvia)'s attempts to improve the code for greater reproducibility. For centralized data cleaning for Phase II of TTT, see the separate repo [ttt-p2-cleaning](https://github.com/jwe4ec/ttt-p2-cleaning).
 
@@ -47,11 +47,11 @@ Raw EMA data are stored in the `/TRACK to TREAT/Data/LifePak Raw Data (Do Not Mo
 
 #### Clean
 
-Outputs of the initial data cleaning code are stored in the `/TRACK to TREAT/Data/Processed Data` folder
+Outputs of the initial data cleaning code are stored in the `/TRACK to TREAT/Data/Processed Data/2022 From Michael Mullarkey` folder
 
 ### Code
 
-The present repo uses the following scripts from the `/TRACK to TREAT/Code/Cleaning Data` folder as a starting point for centralized data cleaning. Given that in general the Qualtrics data seem to have been cleaned before the LifePak data (after which each dataset was deidentified), in this repo the scripts have been numbered in the order to be run.
+The present repo uses the following scripts from the `/TRACK to TREAT/Code/Data Cleaning/old/2022 From Michael Mullarkey` folder as a starting point for centralized data cleaning. Given that in general the Qualtrics data seem to have been cleaned before the LifePak data (after which each dataset was deidentified), in this repo the scripts have been numbered in the order to be run.
 
 #### `01_ttt_phase1_qualtrics_cleaning.Rmd`
 
@@ -72,10 +72,10 @@ Inputs the following 12 raw CSV files (out of the 18 from Qualtrics)
 ```
 
 Also inputs `dp5_p1_scoring.csv`
-- This file, in `/TRACK to TREAT/Code/Cleaning Data`, was obtained by Jeremy Eberle from Michael Mullarkey on 10/31/23. Michael stated that he obtained the file from a Google Drive folder owned by Sharon Chen.
+- This file, in `/TRACK to TREAT/Code/Data Cleaning/old/2022 From Michael Mullarkey`, was obtained by Jeremy Eberle from Michael on 10/31/23. Michael stated that he obtained the file from a Google Drive folder owned by Sharon Chen.
 
 Outputs (though both are commented out) `yb_lsmh_ids_dates.csv` and `cleaned_qualtrics_ttt_phase_1.csv`. Moreover, outputs `cleaned_qualtrics_ttt_phase_1_fixed_220604.csv`, but this does not appear to be used later in data cleaning pipeline (seems later scripts just input `cleaned_qualtrics_ttt_phase_1.csv`)
-- Isaac Ahuvia stated that he revised the cleaning script in May 2022 just to keep a variable that had been deleted or something similar, so `cleaned_qualtrics_ttt_phase_1_fixed_220604.csv` may relate to this. Both this script and a separate script `ttt_phase1_qualtrics_cleaning_fix.Rmd` (which is not on the present repo and which outputs a CSV file with a different date, `cleaned_qualtrics_ttt_phase_1_fixed_220606.csv`) were last modified on the same date (Date Modified metadata of 6/6/22).
+- Isaac Ahuvia stated that he revised the cleaning script in May 2022 just to keep a variable that had been deleted or something similar, so `cleaned_qualtrics_ttt_phase_1_fixed_220604.csv` may relate to this. Both this script and a separate script `ttt_phase1_qualtrics_cleaning_fix.Rmd` (which is not on the present repo but in `/TRACK to TREAT/Code/Data Cleaning/old/2022.06 From Isaac Ahuvia` and which outputs a CSV file with a different date, `cleaned_qualtrics_ttt_phase_1_fixed_220606.csv`) were last modified on the same date (Date Modified metadata of 6/6/22).
 - Note: `02_ttt_phase1_lifepak_cleaning.Rmd` below inputs `cleaned_qualtrics_ttt_phase_1.csv` and then overwrites it after correcting some participant IDs
 
 #### `02_ttt_phase1_lifepak_cleaning.Rmd`
@@ -107,6 +107,8 @@ The following files in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder appea
 
 - `TRACK to TREAT/Data/readme_ttt_p1.docx`
 - `TRACK to TREAT/Data/Processed Data/README.rtf`
+- `TRACK to TREAT/Code/Data Cleaning/README_ttt_p1_data_cleaning.docx`
+  - Points to present repo as most recent data cleaning effort
 
 #### LifePak
 
