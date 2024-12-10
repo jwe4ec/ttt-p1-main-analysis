@@ -106,7 +106,7 @@ The following files in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder appea
 #### General
 
 - `TRACK to TREAT/Data/readme_ttt_p1.docx`
-- `TRACK to TREAT/Data/Processed Data/README.rtf`
+- `TRACK to TREAT/Data/Processed Data/2022 From Michael Mullarkey/README.rtf`
 - `TRACK to TREAT/Code/Data Cleaning/README_ttt_p1_data_cleaning.docx`
   - Points to present repo as most recent data cleaning effort
 
