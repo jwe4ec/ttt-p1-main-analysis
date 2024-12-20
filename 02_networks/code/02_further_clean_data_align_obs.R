@@ -115,7 +115,7 @@ range(unlist(lapply(dat_split[names(dat_split) != 34516], function(x) {
 # ---------------------------------------------------------------------------- #
 
 # Compute difference in hours between 7:30 am on the date of each participant's 
-# first notification the current response_time
+# first notification and the current response_time
 
 dat <- dat %>%
   group_by(lifepak_id) %>%
