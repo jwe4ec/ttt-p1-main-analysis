@@ -491,6 +491,22 @@ net_params_mlvar <- label_merge_net_params(exp_inf_cent_mlvar,   exp_inf_cent_ml
 net_params_var_mlvar <- merge(net_params_var, net_params_mlvar, by = "lifepak_id", all = TRUE)
 
 # ---------------------------------------------------------------------------- #
+# Exclude mean centralities and overall connectivity ----
+# ---------------------------------------------------------------------------- #
+
+# Given that mean centralities are perfectly collinear with individual centralities
+# and that overall connectivity is perfectly collinear with internode and intranode
+# connectivities, exclude mean centralities and overall connectivity
+
+exclude_params_stem <- c("m_sad_interest_step1", "m_sad_interest_step2", 
+                         "m_sad_interest_acc", "m_sad_interest_mcc", "overall_conn")
+
+exclude_params <- c(paste0(exclude_params_stem, "__var"),
+                    paste0(exclude_params_stem, "__mlvar"))
+
+net_params_var_mlvar <- net_params_var_mlvar[, !(names(net_params_var_mlvar) %in% exclude_params)]
+
+# ---------------------------------------------------------------------------- #
 # Export network parameters ----
 # ---------------------------------------------------------------------------- #
 
@@ -498,4 +514,4 @@ net_params_path <- "./02_networks/results/net_params/"
 
 dir.create(net_params_path)
 
-save(net_params_var_mlvar, file = paste0(net_params_path, "net_params_var_mlvar.RDS"))      
+save(net_params_var_mlvar, file = paste0(net_params_path, "net_params_var_mlvar.RDS"))
