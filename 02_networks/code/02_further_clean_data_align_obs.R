@@ -686,9 +686,19 @@ data_var <- data_var %>% filter(lifepak_id != 550350)
 length(unique(data_var$lifepak_id)) == 53
 
 # ---------------------------------------------------------------------------- #
+# Add columns for separate perturbation analysis ----
+# ---------------------------------------------------------------------------- #
+
+temp <- dat_bin[c("lifepak_id", "bin_no_adj", 
+                  "study_start_time", "notification_time", "response_time", "hr_since_start", "bin_range_adj")]
+
+data_var_perturb <- merge(data_var, temp, by = c("lifepak_id", "bin_no_adj"), all.x = TRUE, sort = FALSE)
+
+# ---------------------------------------------------------------------------- #
 # Export data ----
 # ---------------------------------------------------------------------------- #
 
 dir.create("./02_networks/data/final_clean")
 
-save(data_var, file = "./02_networks/data/final_clean/data_var.RDS")
+save(data_var,         file = "./02_networks/data/final_clean/data_var.RDS")
+save(data_var_perturb, file = "./02_networks/data/final_clean/data_var_perturb.RDS")
