@@ -29,7 +29,7 @@ groundhog_day <- version_control()
 # No packages loaded
 
 # ---------------------------------------------------------------------------- #
-# Import clean EMA data, computed network parameters, and restricted clean Qualtrics data  ----
+# Import clean EMA data, computed network parameters, and selected clean Qualtrics data  ----
 # ---------------------------------------------------------------------------- #
 
 # TODO: Update data after Phase I data cleaning is complete
@@ -51,10 +51,14 @@ load("./02_networks/results/net_params/net_params_var_mlvar.RDS")
 
 # TODO: Finalize file organization after Phase I data cleaning is complete
 
-  # TODO: Import restricted clean Qualtrics data
 
 
 
+
+selected_clean_dat_path <- "./03_ml/data/selected_clean/"
+
+load(paste0(selected_clean_dat_path, "y_qualtrics_dat_sel.RData"))
+load(paste0(selected_clean_dat_path, "p_qualtrics_dat_sel.RData"))
 
 # ---------------------------------------------------------------------------- #
 # Compute raw means of clean EMA items across time per participant ----

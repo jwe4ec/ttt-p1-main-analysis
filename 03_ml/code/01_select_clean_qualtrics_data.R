@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------- #
-# Restrict Qualtrics Data for Prediction Models -----
+# Select Clean Qualtrics Data for Prediction Models -----
 # Author: Jeremy W. Eberle
 # ---------------------------------------------------------------------------- #
 
@@ -38,13 +38,15 @@ groundhog_day <- version_control()
 
 
 
+# Note: Must be connected to VPN to access ResFiles directory below
+
 clean_qualtrics_dat_path <- "R:/MSS/Schleider_Lab/jslab/TRACK to TREAT/Data/Clean Data (Isaac)/"
 
 y_qualtrics_dat <- readRDS(paste0(clean_qualtrics_dat_path, "Phase 1 Youth Qualtrics Data.RDS"))
 p_qualtrics_dat <- readRDS(paste0(clean_qualtrics_dat_path, "Phase 1 Parent Qualtrics Data.RDS"))
 
 # ---------------------------------------------------------------------------- #
-# Define and restrict to deidentified Qualtrics columns of interest ----
+# Define columns of interest ----
 # ---------------------------------------------------------------------------- #
 
 # Define metadata columns
@@ -63,7 +65,11 @@ all(p_meta_cols %in% names(p_qualtrics_dat))
 
 
 
-# Youth-rated
+# TODO (get all items/scores for a given measure and then exclude irrelevant ones): Youth-rated
+
+
+
+
 
 y_cdi_cols     <- c(paste0("yb_cdi_",  1:28),
                     paste0("y3m_cdi_", 1:28),
@@ -85,9 +91,15 @@ y_bads_ar_cols <- c(paste0("yb_bads_",  c(8, 9, 10, 13, 14, 15, 24, 25)),
                     paste0("y3m_bads_", c(8, 9, 10, 13, 14, 15, 24, 25)),
                     "yb_bads_ar_mean", "y3m_bads_ar_mean")
 
-all(c(y_cdi_cols, y_bhs_cols, y_pcsc_cols, y_bads_ac_cols, y_bads_ar_cols) %in% names(y_qualtrics_dat))
+y_outcome_cols <- c(y_cdi_cols, y_bhs_cols, y_pcsc_cols, y_bads_ac_cols, y_bads_ar_cols)
 
-# Parent-rated
+all(y_outcome_cols %in% names(y_qualtrics_dat))
+
+# TODO (get all demographics items and then exclude irrelevant ones): Parent-rated
+
+
+
+
 
 p_cdi_cols     <- c(paste0("pb_cdi_",  1:17),
                     paste0("p3m_cdi_", 1:17),
@@ -99,16 +111,27 @@ p_cdi_cols     <- c(paste0("pb_cdi_",  1:17),
 
 
 
-# Note: Exclude "pb_birthorder" (identifiable info) and treatment history (not relevant)
+
 
 p_dem_cols     <- c("pb_childage", "pb_childsex", "pb_childgender", "pb_childethnicity", 
                     "pb_grade", "pb_school", "pb_income", "pb_dependent")
 
 all(c(p_cdi_cols, p_dem_cols) %in% names(p_qualtrics_dat))
 
-# TODO: Restrict to columns of interest (separate outcomes from demographics)
+# ---------------------------------------------------------------------------- #
+# Select columns of interest ----
+# ---------------------------------------------------------------------------- #
 
-View(p_qualtrics_dat[, p_dem_cols])
+y_qualtrics_dat_sel <- y_qualtrics_dat[, c(y_meta_cols, y_outcome_cols)]
+p_qualtrics_dat_sel <- p_qualtrics_dat[, c(p_meta_cols, p_cdi_cols, p_dem_cols)]
 
+# ---------------------------------------------------------------------------- #
+# Save data ----
+# ---------------------------------------------------------------------------- #
 
+selected_clean_dat_path <- "./03_ml/data/selected_clean/"
 
+dir.create(selected_clean_dat_path, recursive = TRUE)
+
+save(y_qualtrics_dat_sel, file = paste0(selected_clean_dat_path, "y_qualtrics_dat_sel.RData"))
+save(p_qualtrics_dat_sel, file = paste0(selected_clean_dat_path, "p_qualtrics_dat_sel.RData"))
