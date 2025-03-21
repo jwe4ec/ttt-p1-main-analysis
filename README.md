@@ -165,7 +165,13 @@ lifepak_files <- files[c(1:5)]
 
 
 
-## Network Analyses
+## Network Analyses and Prediction Models
+
+**TODO: Jeremy to update this section**
+
+
+
+
 
 ### Data
 
@@ -182,7 +188,7 @@ Bringmann](https://github.com/LauraBringmann) using code in TODO. Analyses were 
 
 
 
-## Machine Learning
+## Other Machine Learning
 
 **TODO: Jeremy to update this section**
 
