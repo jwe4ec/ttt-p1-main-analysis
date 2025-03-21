@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------- #
-# Run VAR and ML-VAR Network Analyses ----
+# Run VAR and ML-VAR Network Models ----
 # Authors: Josip Razum, Sebastian Castro-Alvarez, Laura F. Bringmann, Jeremy W. Eberle
 # ---------------------------------------------------------------------------- #
 
@@ -65,7 +65,7 @@ load("./02_networks/data/final_clean/data_var.RDS")
 # Create and export vector to store unique participant IDs ----
 # ---------------------------------------------------------------------------- #
 
-ids <- unique(data_var$lifepak_id)
+data_var_lifepak_ids <- unique(data_var$lifepak_id)
 
 # Export for labeling results by participant later
 

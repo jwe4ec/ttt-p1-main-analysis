@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------- #
-# Select Clean Qualtrics Data for Prediction Models -----
+# Select Clean Qualtrics Data -----
 # Author: Jeremy W. Eberle
 # ---------------------------------------------------------------------------- #
 
@@ -38,12 +38,29 @@ groundhog_day <- version_control()
 
 
 
-# Note: Must be connected to VPN to access ResFiles directory below
+# TODO (files were overwritten, so use local directory versions below): Note: Must 
+# be connected to VPN to access ResFiles directory below
 
-clean_qualtrics_dat_path <- "R:/MSS/Schleider_Lab/jslab/TRACK to TREAT/Data/Clean Data (Isaac)/"
+# clean_qualtrics_dat_path <- "R:/MSS/Schleider_Lab/jslab/TRACK to TREAT/Data/Clean Data (Isaac)/"
+# 
+# y_qualtrics_dat <- readRDS(paste0(clean_qualtrics_dat_path, "Phase 1 Youth Qualtrics Data.RDS"))
+# p_qualtrics_dat <- readRDS(paste0(clean_qualtrics_dat_path, "Phase 1 Parent Qualtrics Data.RDS"))
 
-y_qualtrics_dat <- readRDS(paste0(clean_qualtrics_dat_path, "Phase 1 Youth Qualtrics Data.RDS"))
-p_qualtrics_dat <- readRDS(paste0(clean_qualtrics_dat_path, "Phase 1 Parent Qualtrics Data.RDS"))
+
+
+
+
+# TODO (temporarily using this local path): Note: "pb_birthorder" was removed by
+# Jeremy prior to export from parent cleaning script due to identifiable info.
+
+local_clean_qualtrics_dat_path <- "C:/Users/jwc3589/Documents/github_repos/TTT Phase I Cleaning Repo (Isaac's)/track-to-treat/Phase 1/clean_data/"
+
+y_qualtrics_dat <- readRDS(paste0(local_clean_qualtrics_dat_path, "Phase 1 Youth Qualtrics Clean Data_2025-02-14.rds"))
+p_qualtrics_dat <- readRDS(paste0(local_clean_qualtrics_dat_path, "Phase 1 Parent Qualtrics Data_2025-02-14.rds"))
+
+
+
+
 
 # ---------------------------------------------------------------------------- #
 # Define columns of interest ----
@@ -129,7 +146,7 @@ p_qualtrics_dat_sel <- p_qualtrics_dat[, c(p_meta_cols, p_cdi_cols, p_dem_cols)]
 # Save data ----
 # ---------------------------------------------------------------------------- #
 
-selected_clean_dat_path <- "./03_ml/data/selected_clean/"
+selected_clean_dat_path <- "./02_networks/data/selected_clean/"
 
 dir.create(selected_clean_dat_path, recursive = TRUE)
 

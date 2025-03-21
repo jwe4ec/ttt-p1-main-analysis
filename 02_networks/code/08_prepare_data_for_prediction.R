@@ -29,7 +29,7 @@ groundhog_day <- version_control()
 # No packages loaded
 
 # ---------------------------------------------------------------------------- #
-# Import clean EMA data, computed network parameters, and selected clean Qualtrics data  ----
+# Import clean EMA data, computed network parameters, and merged Qualtrics data  ----
 # ---------------------------------------------------------------------------- #
 
 # TODO: Update data after Phase I data cleaning is complete
@@ -49,16 +49,11 @@ ema_dat <- data_var
 
 load("./02_networks/results/net_params/net_params_var_mlvar.RDS")
 
-# TODO: Finalize file organization after Phase I data cleaning is complete
+# TODO: Import merged Qualtrics data
 
 
 
 
-
-selected_clean_dat_path <- "./03_ml/data/selected_clean/"
-
-load(paste0(selected_clean_dat_path, "y_qualtrics_dat_sel.RData"))
-load(paste0(selected_clean_dat_path, "p_qualtrics_dat_sel.RData"))
 
 # ---------------------------------------------------------------------------- #
 # Compute raw means of clean EMA items across time per participant ----
@@ -83,12 +78,7 @@ for (node_var in node_vars) {
 
 comb_dat <- merge(net_params_var_mlvar, raw_means, "lifepak_id", all.x = TRUE, sort = FALSE)
 
-
-
-
-# ---------------------------------------------------------------------------- #
-# TODO: Restrict to participants with complete baseline and 3-month data ----
-# ---------------------------------------------------------------------------- #
+# TODO: Add merged Qualtrics data
 
 
 

@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------- #
-# Further Clean Data and Align Observations in Time
+# Further Clean LifePak Data and Align Observations in Time
 # Authors: Jeremy W. Eberle, Josip Razum, Sebastian Castro-Alvarez
 # ---------------------------------------------------------------------------- #
 
@@ -35,10 +35,17 @@ groundhog.library(pkgs, groundhog_day)
 # Import intermediately cleaned data ----
 # ---------------------------------------------------------------------------- #
 
-# Load data for all participants
+# TODO: Load data from Michael ("dat") and Isaac ("dat_new") for all participants
 
 dat <- read.csv2("./02_networks/data/intermediate_clean/deid_cleaned_lifepak_ttt_phase_1.csv",
                  header = TRUE, sep = ",")
+
+clean_data_dir <- "R:\\MSS\\Schleider_Lab\\jslab\\TRACK to TREAT\\Data\\Clean Data (Isaac)\\" # TODO: May have been overwritten
+dat_new <- readRDS(paste0(clean_data_dir, "Phase 1 LifePak Data.rds"))
+
+
+
+
 
 # Load test data (before and after applying Mplus TINTERVAL for "lifepak_id" 26232)
 
@@ -46,6 +53,12 @@ df_befor_tint <- read.table("./02_networks/data/test_mplus_tinterval/id26232_bef
                             col.names = c("time", "int", "sad"))
 df_after_tint <- read.table("./02_networks/data/test_mplus_tinterval/id26232_after_tinterval.dat", na.strings = "*",
                             col.names = c("int", "sad", "int_and_1", "sad_and_1", "time", "newtime", "bint"))
+
+# TODO: Load LifePak IDs with complete Qualtics outcome data
+
+
+
+
 
 # ---------------------------------------------------------------------------- #
 # Further clean data ----
@@ -71,12 +84,15 @@ dat$response_time     <- as.POSIXct(gsub("T", "", dat$response_time),     tz = "
 # the first notifications was at "11:00:58 GMT".
 
 dat_split <- split(dat, dat$lifepak_id)
-
-# View(dat[dat$lifepak_id == 34516, ])
+dat_new_split <- split(dat_new, dat_new$lifepak_id) # TODO: Added
 
 range(unlist(lapply(dat_split, function(x) {
   format(min(x$notification_time), format = "%H:%M:%S %Z")
 }))) == c("07:31:15 GMT", "22:07:24 GMT")
+
+range(unlist(lapply(dat_new_split, function(x) {    # TODO: Isaac recoded participant 34516 (range is different)
+  format(min(x$notification_datetime), format = "%H:%M:%S %Z")
+}))) == c("07:31:15 UTC", "11:00:58 UTC")
 
 range(unlist(lapply(dat_split[names(dat_split) != 34516], function(x) {
   format(min(x$notification_time), format = "%H:%M:%S %Z")
@@ -92,7 +108,7 @@ range(unlist(lapply(dat_split[names(dat_split) != 34516], function(x) {
 # View(dat[dat$lifepak_id == 546191, ])
 # View(dat[dat$lifepak_id == 908905, ])
 
-range(unlist(lapply(dat_split[!(names(dat_split) %in% 
+range(unlist(lapply(dat_split[!(names(dat_split) %in%      # TODO: Isaac recoded participant 34516 (so remove here)
                                   c(34516, 815120, 546191, 908905))], function(x) {
   format(min(x$notification_time), format = "%H:%M:%S %Z")
 }))) == c("07:31:15 GMT", "10:26:34 GMT")
@@ -106,7 +122,7 @@ range(unlist(lapply(dat_split, function(x) {
   min(format((x$notification_time), format = "%H:%M:%S %Z"))
 }))) == c("07:30:01 GMT", "22:07:24 GMT")
 
-range(unlist(lapply(dat_split[names(dat_split) != 34516], function(x) {
+range(unlist(lapply(dat_split[names(dat_split) != 34516], function(x) { # TODO: Isaac recoded participant 34516 (so remove here)
   min(format((x$notification_time), format = "%H:%M:%S %Z"))
 }))) == c("07:30:01 GMT", "08:42:41 GMT")
 
@@ -222,11 +238,41 @@ nrow(dat[dat$response_no_cln > 105 &
 dat <- dat[!(dat$response_no_cln > 105 &
                rowSums(is.na(dat[, node_vars])) == length(node_vars)), ]
 
+
+
+
+
+# TODO: In Isaac's data, look at all these rows after 105 (some are Feedback, some aren't).
+# Then continue reviewing below for other tasks Isaac might need to do in his cleaning.
+
+dat_new_split <- split(dat_new, dat_new$lifepak_id)
+dat_new_split <- lapply(dat_new_split, function(x) {
+  x$response_no_cln <- NA
+  x$response_no_cln <- 1:nrow(x)
+  
+  return(x)
+})
+dat_new <- do.call(rbind, dat_new_split)
+
+# View(dat_new_split[["958251"]])
+
+table(dat_new[dat_new$survey_type == "EMA", "response_no_cln"], useNA = "always")
+table(dat_new[dat_new$survey_type == "Feedback", "response_no_cln"], useNA = "always")
+
+nrow(dat_new[dat_new$response_no_cln > 105, ]) == 197
+
+View(dat_new[(dat_new$response_no_cln > 105) & dat_new$survey_type == "Feedback", ])
+View(dat_new[(dat_new$response_no_cln > 105) & dat_new$survey_type != "Feedback", ])
+
+
+
+
+
 # ---------------------------------------------------------------------------- #
 # Inspect missing beeps ----
 # ---------------------------------------------------------------------------- #
 
-# Note: 7 participants have fewer than 105 beeps. Laura Jans indicated on 4/1/24
+# Note: 7 participants have fewer than 105 beeps. Laura Jans indicated on 4/1/24  # TODO: Update here and below as needed
 # that (a) 5 (IDs 60988, 546191, 558692, 659070, 697540) likely deleted the app 
 # or got a new phone without informing the study team; (b) 1 (ID 155884) withdrew 
 # from study because they were no longer interested; and (c) 1 (ID 34516) accidentally 
