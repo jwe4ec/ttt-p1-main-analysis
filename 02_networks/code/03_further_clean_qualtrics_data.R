@@ -123,9 +123,11 @@ length(lifepak_ids_qualtrics_compl) == 84
 # Save data and IDs  ----
 # ---------------------------------------------------------------------------- #
 
-# TODO: Save merged Qualtrics data and LifePak IDs of participants who have complete
+# Save merged Qualtrics data and LifePak IDs of participants who have complete
 # Qualtrics outcome data
 
+merged_clean_dat_path <- "./02_networks/data/merged_clean/"
+dir.create(merged_clean_dat_path)
 
-
-
+save(qualtrics_dat_items_scales_dem, file = paste0(merged_clean_dat_path, "qualtrics_dat_items_scales_dem.RData"))
+save(lifepak_ids_qualtrics_compl,    file = paste0(merged_clean_dat_path, "lifepak_ids_qualtrics_compl.RData"))

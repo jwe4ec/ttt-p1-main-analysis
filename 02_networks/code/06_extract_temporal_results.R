@@ -34,6 +34,12 @@ groundhog.library("dplyr", groundhog_day)
 # Import results ----
 # ---------------------------------------------------------------------------- #
 
+# TODO: Re-extract results once network models have been refit
+
+
+
+
+
 varfit           <- readRDS(file = "./02_networks/results/raw/varfit.RDS")
 varfit_control   <- readRDS(file = "./02_networks/results/raw/varfit_control.RDS")
 varfit_fun       <- readRDS(file = "./02_networks/results/raw/varfit_fun.RDS")

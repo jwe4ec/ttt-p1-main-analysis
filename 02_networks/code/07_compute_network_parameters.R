@@ -36,6 +36,12 @@ groundhog.library(pkgs, groundhog_day)
 # Import extracted results and thresholded adjacency matrices  ----
 # ---------------------------------------------------------------------------- #
 
+# TODO: Re-extract results once network models have been refit
+
+
+
+
+
 extracted_results_path <- "./02_networks/results/extracted/"
 
 load(paste0(extracted_results_path, "results_var.RDS"))

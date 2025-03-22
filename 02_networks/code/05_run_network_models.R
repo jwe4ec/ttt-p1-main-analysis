@@ -60,12 +60,26 @@ library("esmpack")
 # ---------------------------------------------------------------------------- #
 
 load("./02_networks/data/final_clean/data_var.RDS")
+load("./02_networks/data/final_clean/data_var_qualtrics_compl.RDS")
+
+# Note: We originally fit network models to the 53 participants in "data_var".
+# We then refit the models using only the 41 participants in "data_var_qualtrics_compl"
+# (those who have complete Qualtrics outcome data, required for the prediction models)
+
+  # TODO: Refit the models on this final dataset once data cleaning is complete. So
+  # far the network models have been fit to the 53 participants in "data_var"
+
+
+
+
+
+dat <- data_var_qualtrics_compl
 
 # ---------------------------------------------------------------------------- #
 # Create and export vector to store unique participant IDs ----
 # ---------------------------------------------------------------------------- #
 
-data_var_lifepak_ids <- unique(data_var$lifepak_id)
+ids <- unique(dat$lifepak_id)
 
 # Export for labeling results by participant later
 
@@ -84,8 +98,8 @@ if (!(dir.exists(mplus_var_path))) {dir.create(mplus_var_path, recursive = TRUE)
 setwd(mplus_var_path)
 
 for (i in 1:length(ids)) {
-  tmp <- data_var[data_var$lifepak_id == ids[i], 
-                  c("bin_no_adj", "bad_d", "control_d", "energy_d", "focus_d", "fun_d", "interest_d", "movement_d", "sad_d")]
+  tmp <- dat[dat$lifepak_id == ids[i], 
+             c("bin_no_adj", "bad_d", "control_d", "energy_d", "focus_d", "fun_d", "interest_d", "movement_d", "sad_d")]
   tmp <- na.omit(tmp)
   names(tmp) <- c("time", "bad", "cont", "ener", "foc", "fun", "int", "move", "sad")
   
@@ -115,8 +129,8 @@ if (!(dir.exists(mplus_var_control_path))) {dir.create(mplus_var_control_path)}
 setwd(mplus_var_control_path)
 
 for (i in 1:length(ids)) {
-  tmp <- data_var[data_var$lifepak_id == ids[i], 
-                  c("bin_no_adj", "bad_d", "control_d", "energy_d", "focus_d", "interest_d", "movement_d", "sad_d")]
+  tmp <- dat[dat$lifepak_id == ids[i], 
+             c("bin_no_adj", "bad_d", "control_d", "energy_d", "focus_d", "interest_d", "movement_d", "sad_d")]
   tmp <- na.omit(tmp)
   names(tmp) <- c("time", "bad", "cont", "ener", "foc", "int", "move", "sad")
   
@@ -146,8 +160,8 @@ if (!(dir.exists(mplus_var_fun_path))) {dir.create(mplus_var_fun_path)}
 setwd(mplus_var_fun_path)
 
 for (i in 1:length(ids)) {
-  tmp <- data_var[data_var$lifepak_id == ids[i], 
-                  c("bin_no_adj", "bad_d", "energy_d", "focus_d","fun_d", "interest_d", "movement_d", "sad_d")]
+  tmp <- dat[dat$lifepak_id == ids[i], 
+             c("bin_no_adj", "bad_d", "energy_d", "focus_d","fun_d", "interest_d", "movement_d", "sad_d")]
   tmp <- na.omit(tmp)
   names(tmp) <- c("time", "bad", "ener", "foc", "fun", "int", "move", "sad")
   
@@ -176,7 +190,7 @@ if (!(dir.exists(mplus_mlvar_path))) {dir.create(mplus_mlvar_path)}
 
 setwd(mplus_mlvar_path)
 
-tmp <- data_var[, c("lifepak_id", "bin_no_adj", "bad_d", "control_d", "energy_d", "focus_d", "fun_d", "interest_d", "movement_d", "sad_d")]
+tmp <- dat[, c("lifepak_id", "bin_no_adj", "bad_d", "control_d", "energy_d", "focus_d", "fun_d", "interest_d", "movement_d", "sad_d")]
 tmp <- na.omit(tmp)
 names(tmp) <- c("id", "time", "bad", "cont", "ener", "foc", "fun", "int", "move", "sad")
 
@@ -208,7 +222,7 @@ if (!(dir.exists(mplus_mlvar_control_path))) {dir.create(mplus_mlvar_control_pat
 
 setwd(mplus_mlvar_control_path)
 
-tmp <- data_var[, c("lifepak_id", "bin_no_adj", "bad_d", "control_d", "energy_d", "focus_d", "interest_d", "movement_d", "sad_d")]
+tmp <- dat[, c("lifepak_id", "bin_no_adj", "bad_d", "control_d", "energy_d", "focus_d", "interest_d", "movement_d", "sad_d")]
 tmp <- na.omit(tmp)
 names(tmp) <- c("id", "time", "bad", "cont", "ener", "foc", "int", "move", "sad")
 
@@ -238,7 +252,7 @@ if (!(dir.exists(mplus_mlvar_fun_path))) {dir.create(mplus_mlvar_fun_path)}
 
 setwd(mplus_mlvar_fun_path)
 
-tmp <- data_var[, c("lifepak_id", "bin_no_adj", "bad_d", "energy_d", "focus_d", "fun_d", "interest_d", "movement_d", "sad_d")]
+tmp <- dat[, c("lifepak_id", "bin_no_adj", "bad_d", "energy_d", "focus_d", "fun_d", "interest_d", "movement_d", "sad_d")]
 tmp <- na.omit(tmp)
 names(tmp) <- c("id", "time", "bad", "ener", "foc", "fun", "int", "move", "sad")
 

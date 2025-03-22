@@ -40,8 +40,8 @@ groundhog.library(pkgs, groundhog_day)
 dat <- read.csv2("./02_networks/data/intermediate_clean/deid_cleaned_lifepak_ttt_phase_1.csv",
                  header = TRUE, sep = ",")
 
-clean_data_dir <- "R:\\MSS\\Schleider_Lab\\jslab\\TRACK to TREAT\\Data\\Clean Data (Isaac)\\" # TODO: May have been overwritten
-dat_new <- readRDS(paste0(clean_data_dir, "Phase 1 LifePak Data.rds"))
+# clean_data_dir <- "R:\\MSS\\Schleider_Lab\\jslab\\TRACK to TREAT\\Data\\Clean Data (Isaac)\\" # TODO: May have been overwritten
+# dat_new <- readRDS(paste0(clean_data_dir, "Phase 1 LifePak Data.rds"))
 
 
 
@@ -54,11 +54,9 @@ df_befor_tint <- read.table("./02_networks/data/test_mplus_tinterval/id26232_bef
 df_after_tint <- read.table("./02_networks/data/test_mplus_tinterval/id26232_after_tinterval.dat", na.strings = "*",
                             col.names = c("int", "sad", "int_and_1", "sad_and_1", "time", "newtime", "bint"))
 
-# TODO: Load LifePak IDs with complete Qualtics outcome data
+# Load LifePak IDs with complete Qualtrics outcome data
 
-
-
-
+load(paste0("./02_networks/data/merged_clean/lifepak_ids_qualtrics_compl.RData"))
 
 # ---------------------------------------------------------------------------- #
 # Further clean data ----
@@ -84,15 +82,15 @@ dat$response_time     <- as.POSIXct(gsub("T", "", dat$response_time),     tz = "
 # the first notifications was at "11:00:58 GMT".
 
 dat_split <- split(dat, dat$lifepak_id)
-dat_new_split <- split(dat_new, dat_new$lifepak_id) # TODO: Added
+# dat_new_split <- split(dat_new, dat_new$lifepak_id) # TODO: Added
 
 range(unlist(lapply(dat_split, function(x) {
   format(min(x$notification_time), format = "%H:%M:%S %Z")
 }))) == c("07:31:15 GMT", "22:07:24 GMT")
 
-range(unlist(lapply(dat_new_split, function(x) {    # TODO: Isaac recoded participant 34516 (range is different)
-  format(min(x$notification_datetime), format = "%H:%M:%S %Z")
-}))) == c("07:31:15 UTC", "11:00:58 UTC")
+# range(unlist(lapply(dat_new_split, function(x) {    # TODO: Isaac recoded participant 34516 (range is different)
+#   format(min(x$notification_datetime), format = "%H:%M:%S %Z")
+# }))) == c("07:31:15 UTC", "11:00:58 UTC")
 
 range(unlist(lapply(dat_split[names(dat_split) != 34516], function(x) {
   format(min(x$notification_time), format = "%H:%M:%S %Z")
@@ -245,24 +243,24 @@ dat <- dat[!(dat$response_no_cln > 105 &
 # TODO: In Isaac's data, look at all these rows after 105 (some are Feedback, some aren't).
 # Then continue reviewing below for other tasks Isaac might need to do in his cleaning.
 
-dat_new_split <- split(dat_new, dat_new$lifepak_id)
-dat_new_split <- lapply(dat_new_split, function(x) {
-  x$response_no_cln <- NA
-  x$response_no_cln <- 1:nrow(x)
-  
-  return(x)
-})
-dat_new <- do.call(rbind, dat_new_split)
+# dat_new_split <- split(dat_new, dat_new$lifepak_id)
+# dat_new_split <- lapply(dat_new_split, function(x) {
+#   x$response_no_cln <- NA
+#   x$response_no_cln <- 1:nrow(x)
+#   
+#   return(x)
+# })
+# dat_new <- do.call(rbind, dat_new_split)
 
 # View(dat_new_split[["958251"]])
 
-table(dat_new[dat_new$survey_type == "EMA", "response_no_cln"], useNA = "always")
-table(dat_new[dat_new$survey_type == "Feedback", "response_no_cln"], useNA = "always")
-
-nrow(dat_new[dat_new$response_no_cln > 105, ]) == 197
-
-View(dat_new[(dat_new$response_no_cln > 105) & dat_new$survey_type == "Feedback", ])
-View(dat_new[(dat_new$response_no_cln > 105) & dat_new$survey_type != "Feedback", ])
+# table(dat_new[dat_new$survey_type == "EMA", "response_no_cln"], useNA = "always")
+# table(dat_new[dat_new$survey_type == "Feedback", "response_no_cln"], useNA = "always")
+# 
+# nrow(dat_new[dat_new$response_no_cln > 105, ]) == 197
+# 
+# View(dat_new[(dat_new$response_no_cln > 105) & dat_new$survey_type == "Feedback", ])
+# View(dat_new[(dat_new$response_no_cln > 105) & dat_new$survey_type != "Feedback", ])
 
 
 
@@ -369,7 +367,7 @@ for (lifepak_id in unique(dat$lifepak_id)) {
 no_issues == length(unique(dat$lifepak_id))
 
 # ---------------------------------------------------------------------------- #
-# Remove rows with negative scores ----
+# Exclude participants with negative scores ----
 # ---------------------------------------------------------------------------- #
 
 # Inspection of range for 8 node variables shows that 2 participants have some 
@@ -741,10 +739,17 @@ temp <- dat_bin[c("lifepak_id", "bin_no_adj",
 data_var_perturb <- merge(data_var, temp, by = c("lifepak_id", "bin_no_adj"), all.x = TRUE, sort = FALSE)
 
 # ---------------------------------------------------------------------------- #
+# Exclude participants with incomplete Qualtrics outcome data ----
+# ---------------------------------------------------------------------------- #
+
+data_var_qualtrics_compl <- data_var[data_var$lifepak_id %in% lifepak_ids_qualtrics_compl, ]
+
+# ---------------------------------------------------------------------------- #
 # Export data ----
 # ---------------------------------------------------------------------------- #
 
 dir.create("./02_networks/data/final_clean")
 
-save(data_var,         file = "./02_networks/data/final_clean/data_var.RDS")
-save(data_var_perturb, file = "./02_networks/data/final_clean/data_var_perturb.RDS")
+save(data_var,                 file = "./02_networks/data/final_clean/data_var.RDS")
+save(data_var_qualtrics_compl, file = "./02_networks/data/final_clean/data_var_qualtrics_compl.RDS")
+save(data_var_perturb,         file = "./02_networks/data/final_clean/data_var_perturb.RDS")

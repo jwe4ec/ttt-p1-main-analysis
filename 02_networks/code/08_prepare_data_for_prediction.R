@@ -38,8 +38,8 @@ groundhog_day <- version_control()
 
 
 
-load("./02_networks/data/final_clean/data_var.RDS")
-ema_dat <- data_var
+load("./02_networks/data/final_clean/data_var_qualtrics_compl.RDS")
+ema_dat <- data_var_qualtrics_compl
 
 # TODO: Refit network models after Phase I data cleaning is complete
 
@@ -49,7 +49,9 @@ ema_dat <- data_var
 
 load("./02_networks/results/net_params/net_params_var_mlvar.RDS")
 
-# TODO: Import merged Qualtrics data
+# TODO: Import merged Qualtrics data (update once data cleaning is complete)
+
+load("./02_networks/data/merged_clean/qualtrics_dat_items_scales_dem.RData")
 
 
 
