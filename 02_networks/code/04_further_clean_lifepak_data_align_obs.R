@@ -28,7 +28,7 @@ groundhog_day <- version_control()
 
 # Load packages
 
-pkgs <- c("dplyr", "tidyr")
+pkgs <- c("dplyr", "tidyr", "stringr")
 groundhog.library(pkgs, groundhog_day)
 
 # ---------------------------------------------------------------------------- #
@@ -75,7 +75,7 @@ dat$response_time     <- as.POSIXct(gsub("T", "", dat$response_time),     tz = "
 # Inspect "notification_time" ----
 # ---------------------------------------------------------------------------- #
 
-# Obtain range of first "notification_time" across participants. Participant 34516 
+# Obtain range of first "notification_time" across participants. Participant 34516  # TODO: Isaac recoded 34516
 # has only one row (so will be excluded from analysis due to too few observations), 
 # whose "notification_time" is "22:07:24 GMT". After excluding this participant,
 # the earliest of the first notifications was at "07:31:15 GMT" and the latest of
@@ -638,7 +638,7 @@ dat_bin <- dat_bin[, c("lifepak_id",
 # Compare aligned data with test data from Mplus's TINTERVAL for one participant ----
 # ---------------------------------------------------------------------------- #
 
-# Compare to test data from Mplus for lifepak_id 26232 for node "interest" (or "int")
+# Compare to test data from Mplus for lifepak_id 26232 for node "interest" (or "int")   # TODO: Isaac's has leading 0
 # as example when using "hr_since_bin_alt" (which is what Mplus uses for the original
 # time variable, but we ultimately do not use it above). Note that in "df_after_tint", 
 # column "newtime" is likely the midpoint of the range for a given bin and "bint" likely 
@@ -742,7 +742,23 @@ data_var_perturb <- merge(data_var, temp, by = c("lifepak_id", "bin_no_adj"), al
 # Exclude participants with incomplete Qualtrics outcome data ----
 # ---------------------------------------------------------------------------- #
 
-data_var_qualtrics_compl <- data_var[data_var$lifepak_id %in% lifepak_ids_qualtrics_compl, ]
+# TODO: Temporarily recode 5-digit LifePak IDs to contain leading 0 so that all
+# LifePak IDs are 6 digits (this is Isaac's format)
+
+data_var_tmp <- data_var
+
+data_var_tmp$lifepak_id <- str_pad(data_var_tmp$lifepak_id, width = 6, side = "left", pad = "0")
+
+
+
+
+
+# Exclude 9 participants with incomplete Qualtrics outcome data at baseline or
+# 3 months, leaving 44 participants
+
+data_var_qualtrics_compl <- data_var_tmp[data_var_tmp$lifepak_id %in% lifepak_ids_qualtrics_compl, ]
+
+length(unique(data_var_qualtrics_compl$lifepak_id)) == 44
 
 # ---------------------------------------------------------------------------- #
 # Export data ----

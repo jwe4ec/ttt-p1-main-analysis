@@ -63,7 +63,7 @@ load("./02_networks/data/final_clean/data_var.RDS")
 load("./02_networks/data/final_clean/data_var_qualtrics_compl.RDS")
 
 # Note: We originally fit network models to the 53 participants in "data_var".
-# We then refit the models using only the 41 participants in "data_var_qualtrics_compl"
+# We then refit the models using only the 44 participants in "data_var_qualtrics_compl"
 # (those who have complete Qualtrics outcome data, required for the prediction models)
 
   # TODO: Refit the models on this final dataset once data cleaning is complete. So
