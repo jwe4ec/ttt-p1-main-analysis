@@ -32,7 +32,7 @@ groundhog_day <- version_control()
 # Import data  ----
 # ---------------------------------------------------------------------------- #
 
-# TODO
+# TODO: First compute new predictors for 7-node networks in "compute_network_parameters.R"
 
 
 
