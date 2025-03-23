@@ -333,43 +333,58 @@ global_exp_inf_var   <- compute_global_exp_inf(thres_adj_mats_var)
 global_exp_inf_mlvar <- compute_global_exp_inf(thres_adj_mats_mlvar)
 
 # ---------------------------------------------------------------------------- #
-# Compute sums of selected one-step expected influences in 8-node networks  ----
+# Compute sums of selected one-step expected influences ----
 # ---------------------------------------------------------------------------- #
-
-# TODO: Do this for 7-node networks too
-
-
-
-
 
 # Define function to compute (a) sum of signed outgoing edges connecting "control"
 # to two core depression symptoms ("sad" and "interest") and (b) same connecting 
-# "fun" to such symptoms in 8-node VAR and ML-VAR networks
+# "fun" to such symptoms in VAR and ML-VAR networks
 
-compute_select_exp_inf <- function(adj_mats) {
-  # Compute selected one-step expected influences
-  
-  sum_control_to_sad_interest <- sapply(adj_mats, function(x) {
-    sum(x["control", c("sad", "interest")])
-  })
-  
-  sum_fun_to_sad_interest     <- sapply(adj_mats, function(x) {
-    sum(x["fun",     c("sad", "interest")])
-  })
-  
-  # Combine into data frame
-  
-  select_exp_inf_df <- data.frame(lifepak_id                  = names(adj_mats),
-                                  sum_control_to_sad_interest = sum_control_to_sad_interest,
-                                  sum_fun_to_sad_interest     = sum_fun_to_sad_interest)
+compute_select_exp_inf <- function(adj_mats, network_type) {
+  if (network_type == "8-node") {
+    # Compute selected one-step expected influences
+    
+    sum_control_to_sad_interest <- sapply(adj_mats, function(x) {
+      sum(x["control", c("sad", "interest")])
+    })
+    
+    sum_fun_to_sad_interest     <- sapply(adj_mats, function(x) {
+      sum(x["fun",     c("sad", "interest")])
+    })
+    
+    # Combine into data frame
+    
+    select_exp_inf_df <- data.frame(lifepak_id                  = names(adj_mats),
+                                    sum_control_to_sad_interest = sum_control_to_sad_interest,
+                                    sum_fun_to_sad_interest     = sum_fun_to_sad_interest)
+  } else if (network_type == "7-node with control") {
+    sum_control_to_sad_interest_7 <- sapply(adj_mats, function(x) {
+      sum(x["control", c("sad", "interest")])
+    })
+    
+    select_exp_inf_df <- data.frame(lifepak_id                    = names(adj_mats),
+                                    sum_control_to_sad_interest_7 = sum_control_to_sad_interest_7)
+  } else if (network_type == "7-node with fun") {
+    sum_fun_to_sad_interest_7     <- sapply(adj_mats, function(x) {
+      sum(x["fun",     c("sad", "interest")])
+    })
+    
+    select_exp_inf_df <- data.frame(lifepak_id                    = names(adj_mats),
+                                    sum_fun_to_sad_interest_7     = sum_fun_to_sad_interest_7)
+  }
   
   return(select_exp_inf_df)
 }
 
-# Run function for 8-node VAR and ML-VAR networks
+# Run function
 
-select_exp_inf_var   <- compute_select_exp_inf(thres_adj_mats_var)
-select_exp_inf_mlvar <- compute_select_exp_inf(thres_adj_mats_mlvar)
+select_exp_inf_var           <- compute_select_exp_inf(thres_adj_mats_var,           "8-node")
+select_exp_inf_var_control   <- compute_select_exp_inf(thres_adj_mats_var_control,   "7-node with control")
+select_exp_inf_var_fun       <- compute_select_exp_inf(thres_adj_mats_var_fun,       "7-node with fun")
+
+select_exp_inf_mlvar         <- compute_select_exp_inf(thres_adj_mats_mlvar,         "8-node")
+select_exp_inf_mlvar_control <- compute_select_exp_inf(thres_adj_mats_mlvar_control, "7-node with control")
+select_exp_inf_mlvar_fun     <- compute_select_exp_inf(thres_adj_mats_mlvar_fun,     "7-node with fun")
 
 # ---------------------------------------------------------------------------- #
 # Label network parameters and merge into one data frame ----
@@ -395,10 +410,12 @@ label_net_params <- function(df, target_cols, labels) {
 
 # Define function to label network parameters and merge into one data frame
 
-label_merge_net_params <- function(exp_inf_cent,  exp_inf_cent_control,  exp_inf_cent_fun,
-                                   avg_cont_cent, avg_cont_cent_control, avg_cont_cent_fun,
-                                   mod_cont_cent, mod_cont_cent_control, mod_cont_cent_fun,
-                                   global_exp_inf, select_exp_inf, model_type) {
+label_merge_net_params <- function(exp_inf_cent,   exp_inf_cent_control,   exp_inf_cent_fun,
+                                   avg_cont_cent,  avg_cont_cent_control,  avg_cont_cent_fun,
+                                   mod_cont_cent,  mod_cont_cent_control,  mod_cont_cent_fun,
+                                   global_exp_inf, 
+                                   select_exp_inf, select_exp_inf_control, select_exp_inf_fun,
+                                   model_type) {
   # Label network parameters
   
   node_vars <- c("bad", "control", "energy", "focus", "fun", "interest", "movement", "sad")
@@ -446,13 +463,17 @@ label_merge_net_params <- function(exp_inf_cent,  exp_inf_cent_control,  exp_inf
   label(select_exp_inf$sum_control_to_sad_interest) <- "sum of signed edges from control to sad and interest in 8-node network"
   label(select_exp_inf$sum_fun_to_sad_interest)     <- "sum of signed edges from fun to sad and interest in 8-node network"
   
+  label(select_exp_inf_control$sum_control_to_sad_interest_7) <- "sum of signed edges from control to sad and interest in 7-node network"
+
+  label(select_exp_inf_fun$sum_fun_to_sad_interest_7)         <- "sum of signed edges from fun to sad and interest in 7-node network"
+  
   # Merge into one data frame
   
   dfs <- list(exp_inf_cent,  exp_inf_cent_control,  exp_inf_cent_fun,
               avg_cont_cent, avg_cont_cent_control, avg_cont_cent_fun,
               mod_cont_cent, mod_cont_cent_control, mod_cont_cent_fun,
               global_exp_inf,
-              select_exp_inf)
+              select_exp_inf, select_exp_inf_control, select_exp_inf_fun)
   
   merged_df <- Reduce(function(x, y) merge(x, y, by = "lifepak_id", all = TRUE), 
                       dfs)
@@ -486,15 +507,19 @@ label_merge_net_params <- function(exp_inf_cent,  exp_inf_cent_control,  exp_inf
 
 # Run function for VAR and ML-VAR network parameters
 
-net_params_var   <- label_merge_net_params(exp_inf_cent_var,     exp_inf_cent_var_control,    exp_inf_cent_var_fun, 
-                                           avg_cont_cent_var,    avg_cont_cent_var_control,   avg_cont_cent_var_fun, 
-                                           mod_cont_cent_var,    mod_cont_cent_var_control,   mod_cont_cent_var_fun, 
-                                           global_exp_inf_var,   select_exp_inf_var, "VAR")
+net_params_var   <- label_merge_net_params(exp_inf_cent_var,     exp_inf_cent_var_control,     exp_inf_cent_var_fun, 
+                                           avg_cont_cent_var,    avg_cont_cent_var_control,    avg_cont_cent_var_fun, 
+                                           mod_cont_cent_var,    mod_cont_cent_var_control,    mod_cont_cent_var_fun, 
+                                           global_exp_inf_var,   
+                                           select_exp_inf_var,   select_exp_inf_var_control,   select_exp_inf_var_fun,
+                                           "VAR")
 
-net_params_mlvar <- label_merge_net_params(exp_inf_cent_mlvar,   exp_inf_cent_mlvar_control,  exp_inf_cent_mlvar_fun, 
-                                           avg_cont_cent_mlvar,  avg_cont_cent_mlvar_control, avg_cont_cent_mlvar_fun, 
-                                           mod_cont_cent_mlvar,  mod_cont_cent_mlvar_control, mod_cont_cent_mlvar_fun, 
-                                           global_exp_inf_mlvar, select_exp_inf_mlvar, "ML-VAR")
+net_params_mlvar <- label_merge_net_params(exp_inf_cent_mlvar,   exp_inf_cent_mlvar_control,   exp_inf_cent_mlvar_fun, 
+                                           avg_cont_cent_mlvar,  avg_cont_cent_mlvar_control,  avg_cont_cent_mlvar_fun, 
+                                           mod_cont_cent_mlvar,  mod_cont_cent_mlvar_control,  mod_cont_cent_mlvar_fun, 
+                                           global_exp_inf_mlvar, 
+                                           select_exp_inf_mlvar, select_exp_inf_mlvar_control, select_exp_inf_mlvar_fun,
+                                           "ML-VAR")
 
 # ---------------------------------------------------------------------------- #
 # Merge VAR and ML-VAR network parameters into one data frame ----
