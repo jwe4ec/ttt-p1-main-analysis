@@ -98,6 +98,17 @@ comb_dat <- merge(net_params_var_mlvar, raw_means,          "lifepak_id", all.x 
 comb_dat <- merge(comb_dat, qualtrics_dat_items_scales_dem, "lifepak_id", all.x = TRUE, sort = FALSE)
 
 # ---------------------------------------------------------------------------- #
+# Compute raw change scores for Qualtrics outcomes ----
+# ---------------------------------------------------------------------------- #
+
+comb_dat$y_cdi_m_chg     <- comb_dat$y3m_cdi_mean     - comb_dat$yb_cdi_mean
+comb_dat$p_cdi_m_chg     <- comb_dat$p3m_cdi_mean     - comb_dat$pb_cdi_mean
+comb_dat$y_bhs_m_chg     <- comb_dat$y3m_bhs_mean     - comb_dat$yb_bhs_mean
+comb_dat$y_pcsc_m_chg    <- comb_dat$y3m_pcsc_mean    - comb_dat$yb_pcsc_mean
+comb_dat$y_bads_ac_m_chg <- comb_dat$y3m_bads_ac_mean - comb_dat$yb_bads_ac_mean
+comb_dat$y_bads_ar_m_chg <- comb_dat$y3m_bads_ar_mean - comb_dat$yb_bads_ar_mean
+
+# ---------------------------------------------------------------------------- #
 # TODO: Restrict to participants with complete Qualtrics outcome data ----
 # ---------------------------------------------------------------------------- #
 
@@ -114,14 +125,67 @@ comb_dat <- comb_dat[comb_dat$lifepak_id %in% lifepak_ids_qualtrics_compl, ]
 
 
 # ---------------------------------------------------------------------------- #
-# TODO: Select relevant columns for prediction models ----
+# Identify names of predictors and outcomes of prediction models ----
 # ---------------------------------------------------------------------------- #
 
-# TODO: Restrict to only "lifepak_id", predictors, and outcomes
+# Identify names of raw change scores
 
+m_chg_outcomes <- c("y_cdi_m_chg", "p_cdi_m_chg", "y_bhs_m_chg", "y_pcsc_m_chg", 
+                    "y_bads_ac_m_chg", "y_bads_ar_m_chg")
 
+length(m_chg_outcomes) == 6
 
+all(m_chg_outcomes %in% names(comb_dat))
 
+# Identify names of Qualtrics outcomes at baseline
+
+b_outcomes <- c("yb_cdi_mean", "pb_cdi_mean", "yb_bhs_mean", "yb_pcsc_mean", 
+                "yb_bads_ac_mean", "yb_bads_ar_mean")
+
+length(b_outcomes) == 6
+
+all(b_outcomes %in% names(qualtrics_dat_items_scales_dem))
+
+# Identify names of raw means of EMA items
+
+raw_means_ema_items <- paste0(node_vars, "_m")
+
+length(raw_means_ema_items) == 8
+
+setequal(c("lifepak_id", raw_means_ema_items), names(raw_means))
+
+# Identify names of centrality and density parameters from VAR and ML-VAR models
+
+density_params <- c("inter_conn__var",   "intra_conn__var",
+                    "inter_conn__mlvar", "intra_conn__mlvar")
+
+density_params_var   <- density_params[grepl("__var",   density_params)]
+density_params_mlvar <- density_params[grepl("__mlvar", density_params)]
+
+length(density_params)       == 4
+length(density_params_var)   == 2
+length(density_params_mlvar) == 2
+
+centrality_params <- setdiff(names(net_params_var_mlvar), c("lifepak_id", density_params))
+
+centrality_params_var   <- centrality_params[grepl("__var",   centrality_params)]
+centrality_params_mlvar <- centrality_params[grepl("__mlvar", centrality_params)]
+
+length(centrality_params)       == 88
+length(centrality_params_var)   == 44
+length(centrality_params_mlvar) == 44
+
+all_net_params <- c(density_params_var, density_params_mlvar, centrality_params_var, centrality_params_mlvar)
+
+setequal(c("lifepak_id", all_net_params), names(net_params_var_mlvar))
+
+# ---------------------------------------------------------------------------- #
+# Select relevant columns for prediction models ----
+# ---------------------------------------------------------------------------- #
+
+# Select only "lifepak_id", predictors, and outcomes
+
+pred_dat <- comb_dat[, c("lifepak_id", m_chg_outcomes, b_outcomes, raw_means_ema_items, all_net_params)]
 
 # ---------------------------------------------------------------------------- #
 # TODO: Select relevant columns for demographics table ----
@@ -140,9 +204,10 @@ comb_dat <- comb_dat[comb_dat$lifepak_id %in% lifepak_ids_qualtrics_compl, ]
 
 
 # ---------------------------------------------------------------------------- #
-# TODO: Save data ----
+# Save data ----
 # ---------------------------------------------------------------------------- #
 
+final_clean_path <- "./02_networks/data/final_clean/"
 
-
-
+save(comb_dat, file = paste0(final_clean_path, "comb_dat.RData"))
+save(pred_dat, file = paste0(final_clean_path, "pred_dat.RData"))
