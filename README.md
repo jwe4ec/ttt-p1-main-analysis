@@ -1,5 +1,11 @@
 # ttt-p1-main-analysis
 
+TODO: Document that latest centralized Phase I cleaning is now on [track-to-treat](https://github.com/isaacahuvia/track-to-treat) repo. Move centralied cleaning content on present repo elsewhere, update [track-to-treat](https://github.com/isaacahuvia/track-to-treat) README with URL of that new location, and note in present README that present repo uses a certain version of clean data from [track-to-treat](https://github.com/isaacahuvia/track-to-treat).
+
+
+
+
+
 This repository contains code for centralized data cleaning and the main paper for Phase I of Project TRACK to TREAT. The repo is linked to this project on the Open Science Framework (OSF): [https://osf.io/c4e75/](https://osf.io/c4e75/).
 
 ## Table of Contents
