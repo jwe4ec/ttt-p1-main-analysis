@@ -93,22 +93,22 @@ The following files in the `jslab/TRACK to TREAT` folder appear relevant to data
 ### Issues
 
 - Unable to reproduce clean Qualtrics data
-  - As of 12/3/24, Jeremy can reproduce `cleaned_lifepak_ttt_phase_1.csv` (and `deid_cleaned_lifepak_ttt_phase_1.csv`) per `identical(x, y, FALSE, FALSE, FALSE, FALSE)`
-    - Specifically, he can reproduce the clean LifePak data when using R 4.1.1 (latest version available on 9/28/21; see below) and the most recent versions of `tidyverse`, `skimr`, `glue`, and `janitor` available on 12/3/24 (loaded via `library()`). He tried to use the `groundhog` package to load the latest available package versions on 1/7/22 (date that output files were saved to server; see below) but could not use `groundhog` to load `tidyverse` as `tidyverse` depends on `knitr`, which is "already in use" as it is used to execute Rmd files.
+  - As of 12/3/24, Jeremy can reproduce clean Lifepak Data (`cleaned_lifepak_ttt_phase_1.csv` and `deid_cleaned_lifepak_ttt_phase_1.csv`) per `identical(x, y, FALSE, FALSE, FALSE, FALSE)`.
+    - Specifically, he can do so using R 4.1.1 (latest version available on 9/28/21; see below) and the most recent versions of `tidyverse`, `skimr`, `glue`, and `janitor` available on 12/3/24 (loaded via `library()`). He tried to use the `groundhog` package to load the latest available package versions on 1/7/22 (date that output files were saved to server; see below) but could not use `groundhog` to load `tidyverse` as `tidyverse` depends on `knitr`, which is "already in use" as it is used to execute Rmd files.
   - However, he cannot reproduce `cleaned_qualtrics_ttt_phase_1.csv`
   - It is unclear what R version and package versions should be used for each script
     - `ttt_phase1_qualtrics_cleaning.Rmd` lists 6/17/2021 as the Date; `ttt_phase1_lifepak_cleaning.Rmd` lists 9/28/2021 as the Date. The output files `cleaned_qualtrics_ttt_phase_1.csv` and `cleaned_lifepak_ttt_phase_1.csv` have Date Modified metadata of 1/7/22. Thus, the scripts used R and package versions prior to these dates.
     - Note: Michael stated that he cannot guarantee he always used the most up-to-date packages, but he endorsed using these dates as a starting point for determining which R and package versions he used
 - Unnecessary packages
   - Although many packages are loaded, only a few appear used by each script (see lists below)
-  - Moreover, one of the loaded packages (`doMC`, for parallelization, which does not seem needed) is Unix only and unavailable for Windows
+  - Moreover, one loaded package (`doMC`, for parallelization, which does not seem needed) is Unix only and unavailable for Windows
 ```
 # "01_ttt_phase1_qualtrics_cleaning.Rmd" packages: "tidyverse", "glue", "janitor", "fastDummies", "diffdf", "datapasta", "fuzzyjoin"
 # "02_ttt_phase1_lifepak_cleaning.Rmd" packages:   "tidyverse", "skimr", "glue", "janitor"
 ```
 - Some packages (`datapasta`, `fuzzyjoin`) are loaded partway through script rather than at top
-- Data (`dp5_p1_scoring.csv`) is loaded partway through `ttt_phase1_qualtrics_cleaning.Rmd` rather than at the top
-- Hard-coding (e.g., need to use specific LifePak filenames rather than the code below in Lines 103-109 of `ttt_phase1_lifepak_cleaning.Rmd`)
+- One file (`dp5_p1_scoring.csv`) is loaded partway through `ttt_phase1_qualtrics_cleaning.Rmd` rather than at the top
+- Hard-coding (e.g., need to use LifePak filenames rather than code below in Lines 103-109 of `ttt_phase1_lifepak_cleaning.Rmd`)
 ```
 files <- list.files(pattern = "*.csv")
 lifepak_files <- files[c(1:5)]
