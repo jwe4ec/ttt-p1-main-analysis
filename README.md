@@ -84,7 +84,7 @@ Outputs deidentified data (`deid_cleaned_lifepak_ttt_phase_1.csv` and `deid_clea
 
 ### Other Documentation
 
-The following files in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder appear relevant to data cleaning
+The following files in the `jslab/TRACK to TREAT` folder appear relevant to data cleaning
 
 #### General
 
@@ -157,9 +157,9 @@ code located at TODO. Analyses were revised by [Yama Chang](https://github.com/y
 #### Michael's
 
 **TODO: Compare code on server with code on Michael's [ttt-main-analyses](https://github.com/mcmullarkey/ttt_main_analyses) repo to help determine if code on server is Michael's original code**
-- See `R:\MSS\Schleider_Lab\jslab\TRACK to TREAT\Code\Primary Analyses`
+- See `jslab\TRACK to TREAT\Code\Primary Analyses`
 
 #### Yama's
 
 **TODO: Process and describe Yama's latest code in folder below**
-- See `R:\MSS\Schleider_Lab\jslab\TRACK to TREAT\Code\Primary Analyses\2024.08.01 From Yama Chang`
+- See `jslab\TRACK to TREAT\Code\Primary Analyses\2024.08.01 From Yama Chang`
