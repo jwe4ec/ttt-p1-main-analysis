@@ -81,27 +81,22 @@ The following files in the `jslab/TRACK to TREAT` folder appear relevant to data
 - `TRACK to TREAT/Data/readme_ttt_p1.docx`
 - `TRACK to TREAT/Data/Processed Data/2022 From Michael Mullarkey/README.rtf`
 - `TRACK to TREAT/Code/Data Cleaning/README_ttt_p1_data_cleaning.docx`
-  - Points to present repo as most recent data cleaning effort
+  - Points to [jwe4ec/track-to-treat](https://github.com/jwe4ec/track-to-treat) repo as most recent data cleaning effort
 
 #### LifePak
 
 - `TRACK to TREAT/Data/3TP1_LifePak_Version_IDs.xlsx`
 - `TRACK to TREAT/Data/README info from Laura Jans` folder
   - See contents of this folder for info from Laura Jans re (a) 7 participants who have LifePak data for fewer than the expected number of beeps (see yellow highlights in `2024.04.03 Email with Laura Jans re EMA slider and missing EMA data.pdf`) and (b) whether EMA slider items could be skipped (see orange highlights).
-  - For the main TTT paper, these data are treated as missing (see `02_networks/code/02_further_clean_data_align_obs.R` in the present repo)
+  - For the main TTT paper, these data are treated as missing (see [jwe4ec/ttt-p1-main-analysis](https://github.com/jwe4ec/ttt-p1-main-analysis) repo)
 
-### TODOs
+### Issues
 
-#### General
-
-- TODO: As of 12/3/24, Jeremy can reproduce `cleaned_lifepak_ttt_phase_1.csv` (and `deid_cleaned_lifepak_ttt_phase_1.csv`) per `identical(x, y, FALSE, FALSE, FALSE, FALSE)`. However, he cannot reproduce `cleaned_qualtrics_ttt_phase_1.csv`.
+- As of 12/3/24, Jeremy can reproduce `cleaned_lifepak_ttt_phase_1.csv` (and `deid_cleaned_lifepak_ttt_phase_1.csv`) per `identical(x, y, FALSE, FALSE, FALSE, FALSE)`. However, he cannot reproduce `cleaned_qualtrics_ttt_phase_1.csv`.
   - Specifically, he can reproduce the clean LifePak data when using R 4.1.1 (latest version available on 9/28/21; see below) and the most recent versions of `tidyverse`, `skimr`, `glue`, and `janitor` available on 12/3/24 (loaded via `library()`). He tried to use the `groundhog` package to load the latest available package versions on 1/7/22 (date that output files were saved to server; see below) but could not use `groundhog` to load `tidyverse` as `tidyverse` depends on `knitr`, which is "already in use" as it is used to execute Rmd files.
-
-#### Specific
-
-- TODO: Determine what R version and package versions should be used for each script
-  - `01_ttt_phase1_qualtrics_cleaning.Rmd` lists 6/17/2021 as the Date; `02_ttt_phase1_lifepak_cleaning.Rmd` lists 9/28/2021 as the Date. The output files `cleaned_qualtrics_ttt_phase_1.csv` and `cleaned_lifepak_ttt_phase_1.csv` have Date Modified metadata of 1/7/22. Thus, the scripts used R and package versions prior to these dates.
-  - Note: Michael stated that he cannot guarantee he always used the most up-to-date packages, but he endorsed using these dates as a starting point for determining which R and package versions he used
+  - It is unclear what R version and package versions should be used for each script
+    - `01_ttt_phase1_qualtrics_cleaning.Rmd` lists 6/17/2021 as the Date; `02_ttt_phase1_lifepak_cleaning.Rmd` lists 9/28/2021 as the Date. The output files `cleaned_qualtrics_ttt_phase_1.csv` and `cleaned_lifepak_ttt_phase_1.csv` have Date Modified metadata of 1/7/22. Thus, the scripts used R and package versions prior to these dates.
+    - Note: Michael stated that he cannot guarantee he always used the most up-to-date packages, but he endorsed using these dates as a starting point for determining which R and package versions he used
 
 ## Network Analyses and Prediction Models
 
