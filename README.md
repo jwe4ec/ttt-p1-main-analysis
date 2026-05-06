@@ -4,7 +4,7 @@ This repository contains code for the main paper for Phase 1 of Project Track to
 
 ## Network Analyses and Prediction Models
 
-**TODO: Jeremy to update this section**
+**TODO: Jeremy to update this section and flatten after section below is removed**
 
 
 
@@ -27,7 +27,7 @@ Bringmann](https://github.com/LauraBringmann) using code in TODO. Analyses were 
 
 ## Other Machine Learning
 
-**TODO: Jeremy to update this section**
+**TODO: Jeremy to remove this section**
 
 
 
