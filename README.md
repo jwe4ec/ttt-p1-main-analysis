@@ -1,16 +1,9 @@
 # ttt-p1-main-analysis
 
-TODO: Document that latest centralized Phase I cleaning is now on [track-to-treat](https://github.com/isaacahuvia/track-to-treat) repo. Move centralied cleaning content on present repo elsewhere, update [track-to-treat](https://github.com/isaacahuvia/track-to-treat) README with URL of that new location, and note in present README that present repo uses a certain version of clean data from [track-to-treat](https://github.com/isaacahuvia/track-to-treat).
-
-
-
-
-
-This repository contains code for the main paper for Phase I of Project TRACK to TREAT. The repo is linked to this project on the Open Science Framework (OSF): [https://osf.io/c4e75/](https://osf.io/c4e75/).
+This repository contains code for the main paper for Phase 1 of Project Track to Treat. The repo is linked to this project on the Open Science Framework (OSF): [https://osf.io/c4e75/](https://osf.io/c4e75/).
 
 ## Table of Contents
 
-- [Project Overview](#project-overview)
 - [Centralized Data Cleaning](#centralized-data-cleaning)
   - [Data](#data)
   - [Code](#code)
@@ -19,31 +12,15 @@ This repository contains code for the main paper for Phase I of Project TRACK to
 - [Network Analyses](#network-analyses)
 - [Machine Learning](#machine-learning)
 
-## Project Overview
-
-Phase I of Project TRACK to TREAT (TTT) aims to use parameters from network models estimated from ecological momentary assessment (EMA) data to predict 3-month changes in depression symptoms and related constructs in depressed adolescents. Phase I, an observational study, consisted of a baseline Qualtrics survey, 21 days of EMA (5 pings per day), and another Qualtrics survey 3 months later.
-
 ## Centralized Data Cleaning
 
-Data, initial code, and documentation relevant to centralized data cleaning for Phase I of TTT are stored in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder on the [FSMResFiles](https://www.feinberg.northwestern.edu/it/services/server-storage-and-data/research-data-storage.html) server at [Northwestern University Feinberg School of Medicine](https://www.feinberg.northwestern.edu/).
-
-The initial centralized data cleaning code was drafted by [Michael Mullarkey](https://github.com/mcmullarkey). The Centralized Data Cleaning section of the present repo houses [Jeremy Eberle](https://github.com/jwe4ec) and [Isaac Ahuvia](https://github.com/isaacahuvia)'s attempts to improve the code for greater reproducibility. For centralized data cleaning for Phase II of TTT, see the separate repo [ttt-p2-cleaning](https://github.com/jwe4ec/ttt-p2-cleaning).
-
-Lab staff who contributed to Phase I of TTT include former research coordinators Sharon Leong (formerly Chen) and Akash Shroff, and Laura Jans (research assistant at the time).
+The initial centralized data cleaning code was drafted by [Michael Mullarkey](https://github.com/mcmullarkey). Lab staff who contributed to Phase I of TTT include former research coordinators Sharon Leong (formerly Chen) and Akash Shroff, and Laura Jans (research assistant at the time).
 
 ### Data
-
-Data collection is complete.
 
 #### Raw
 
 ##### From Qualtrics
-
-###### Screening Survey
-
-TODO
-
-###### Study Surveys
 
 Raw baseline and 3-month survey data are stored in the `/TRACK to TREAT/Data/Qualtrics Data/Raw Data` folder, which contains 18 CSV files obtained from Qualtrics (per Date Modified file metadata, presumably 6 files were obtained 6/16/20-5/20/21 and 12 files were obtained on 6/18/21). The Qualtrics cleaning script appears to focus on the latter 12 files (see below).
 
@@ -135,41 +112,6 @@ The following files in the `MSS/Schleider_Lab/jslab/TRACK to TREAT` folder appea
 - TODO: Determine what R version and package versions should be used for each script
   - `01_ttt_phase1_qualtrics_cleaning.Rmd` lists 6/17/2021 as the Date; `02_ttt_phase1_lifepak_cleaning.Rmd` lists 9/28/2021 as the Date. The output files `cleaned_qualtrics_ttt_phase_1.csv` and `cleaned_lifepak_ttt_phase_1.csv` have Date Modified metadata of 1/7/22. Thus, the scripts used R and package versions prior to these dates.
   - Note: Michael stated that he cannot guarantee he always used the most up-to-date packages, but he endorsed using these dates as a starting point for determining which R and package versions he used
-  - Also find way to control version of `knitr` (needed for Rmd files) or do not use Rmd files (see issue above)
-- TODO: Determine what packages are needed, load only those, and load all needed packages at top of script
-  - Although many packages are loaded, only a few appear used by each script (see lists below)
-  - Moreover, one of the loaded packages (`doMC`, for parallelization) is Unix only and unavailable for Windows
-  - Some packages (`datapasta`, `fuzzyjoin`) are loaded partway through script rather than at top
-```
-# "01_ttt_phase1_qualtrics_cleaning.Rmd" packages: "tidyverse", "glue", "janitor", "fastDummies", "diffdf", "datapasta", "fuzzyjoin"
-# "02_ttt_phase1_lifepak_cleaning.Rmd" packages:   "tidyverse", "skimr", "glue", "janitor"
-```
-- TODO: Remove parallelization, as it does not seem needed
-- TODO: Treating `.` as the parent folder for the present repo, create local raw data folders (`./data/raw/qualtrics` and `./data/raw/lifepak`), put raw CSV files in those folders, and use relative file paths to load raw data and output clean data (vs. storing raw data, clean data, and code in same folder)--see below for example. We can then describe the directory structure in this README.
-```
-example_raw_table <- read.csv("./data/raw/qualtrics/example_raw_table.csv")
-
-clean_path <- "./data/clean/"
-dir.create(clean_path)
-write.csv(example_clean_table, paste0(clean_path, "example_clean_table.csv"))
-```
-- TODO: Load `dp5_p1_scoring.csv` at top of `01_ttt_phase1_qualtrics_cleaning.Rmd` (vs. partway through script)
-- TODO: Clearly reflect what `01_ttt_phase1_qualtrics_cleaning.Rmd` should output (see description of its outputs above for various issues)
-- TODO: Remove extraneous code/comments
-- TODO: Avoid hard-coding (e.g., use specific LifePak filenames rather than the code below in Lines 103-109 of `02_ttt_phase1_lifepak_cleaning`)
-```
-files <- list.files(pattern = "*.csv")
-lifepak_files <- files[c(1:5)]
-```
-- TODO: Consider checking for data quality (e.g., see Exclusion Criteria from Phase II [study registration](https://clinicaltrials.gov/study/NCT04607902))
-  - Obvious lack of English fluency in open response questions
-  - Responding with random text in open response questions
-  - Duplicate responses from the same individual in baseline or follow-up surveys
-- TODO: Put deidentified clean data in `./data/clean` folder on [OSF project](https://osf.io/c4e75/) linked to the present repo
-
-
-
-
 
 ## Network Analyses and Prediction Models
 
