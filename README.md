@@ -2,33 +2,33 @@
 
 This repository contains code for the main paper for Phase 1 of Project Track to Treat. The repo is linked to this project on the Open Science Framework (OSF): [https://osf.io/c4e75/](https://osf.io/c4e75/).
 
-## Centralized Data Cleaning
+# Centralized Data Cleaning
 
 The initial centralized data cleaning code was drafted by [Michael Mullarkey](https://github.com/mcmullarkey).
 
 Lab staff who contributed to Phase I of TTT include former research coordinators Sharon Leong (formerly Chen) and Akash Shroff, and Laura Jans (research assistant at the time).
 
-The data and initial code are stored in `jslab/TRACK to TREAT/` on the FSMResFiles server.
+The data, initial code, and documentation are stored in `jslab/TRACK to TREAT/` on the FSMResFiles server.
 
-### Data
+## Data
 
-#### Raw Qualtrics
+### Raw Qualtrics
 
 Raw baseline and 3-month survey data are stored in `/TRACK to TREAT/Data/Qualtrics Data/Raw Data/`, which contains 18 CSV files obtained from Qualtrics (per Date Modified file metadata, presumably 6 files were obtained 6/16/2020-5/20/2021 and 12 files were obtained on 6/18/2021). The Qualtrics cleaning script appears to focus on the latter 12 files (see below).
 
-#### Raw LifePak
+### Raw LifePak
 
 Raw EMA data are stored in `/TRACK to TREAT/Data/LifePak Raw Data (Do Not Modify)/`, which contains 10 CSV files obtained from LifePak (per Date Modified file metadata, presumably 8 files were obtained on 4/28/2020 and 2 files were obtained on 9/28/2021). The LifePak cleaning script appears to focus on the 5 files with `NIS` in the filename (see below); the `/TRACK to TREAT/Data/readme_ttt_p1.docx` file also states that files with `NIS` (which it defines as "notification-initiated survey") in the filename are the data to be used.
 
-#### Clean
+### Clean
 
 Outputs of the initial data cleaning code are stored in `/TRACK to TREAT/Data/Processed Data/2022 From Michael Mullarkey/`
 
-### Code
+## Code
 
 TODO: The present repo uses the following scripts from `/TRACK to TREAT/Code/Data Cleaning/old/2022 From Michael Mullarkey/` as a starting point for centralized data cleaning. Given that in general the Qualtrics data seem to have been cleaned before the LifePak data (after which each dataset was deidentified), in this repo the scripts have been numbered in the order to be run.
 
-#### `01_ttt_phase1_qualtrics_cleaning.Rmd`
+### `01_ttt_phase1_qualtrics_cleaning.Rmd`
 
 Inputs the following 12 raw CSV files (out of the 18 from Qualtrics)
 ```
@@ -50,10 +50,10 @@ Also inputs `dp5_p1_scoring.csv`
 - This file, in `/TRACK to TREAT/Code/Data Cleaning/old/2022 From Michael Mullarkey/`, was obtained by Jeremy Eberle from Michael on 10/31/2023. Michael stated that he obtained the file from a Google Drive folder owned by Sharon Chen.
 
 Outputs (though both are commented out) `yb_lsmh_ids_dates.csv` and `cleaned_qualtrics_ttt_phase_1.csv`. Moreover, outputs `cleaned_qualtrics_ttt_phase_1_fixed_220604.csv`, but this does not appear to be used later in data cleaning pipeline (seems later scripts just input `cleaned_qualtrics_ttt_phase_1.csv`)
-- Isaac Ahuvia stated that he revised the cleaning script in May 2022 just to keep a variable that had been deleted or something similar, so `cleaned_qualtrics_ttt_phase_1_fixed_220604.csv` may relate to this. Both this script and a separate script `ttt_phase1_qualtrics_cleaning_fix.Rmd` (which is not on the present repo but in `/TRACK to TREAT/Code/Data Cleaning/old/2022.06 From Isaac Ahuvia/` and which outputs a CSV file with a different date, `cleaned_qualtrics_ttt_phase_1_fixed_220606.csv`) were last modified on the same date (Date Modified metadata of 6/6/2022).
+- Isaac Ahuvia stated that he revised the cleaning script in May 2022 just to keep a variable that had been deleted or something similar, so `cleaned_qualtrics_ttt_phase_1_fixed_220604.csv` may relate to this. Both this script and the separate `ttt_phase1_qualtrics_cleaning_fix.Rmd` (which is not on the present repo but in `/TRACK to TREAT/Code/Data Cleaning/old/2022.06 From Isaac Ahuvia/` and which outputs a CSV file with a different date, `cleaned_qualtrics_ttt_phase_1_fixed_220606.csv`) were last modified on the same date (Date Modified metadata of 6/6/2022).
 - Note: `02_ttt_phase1_lifepak_cleaning.Rmd` below inputs `cleaned_qualtrics_ttt_phase_1.csv` and then overwrites it after correcting some participant IDs
 
-#### `02_ttt_phase1_lifepak_cleaning.Rmd`
+### `02_ttt_phase1_lifepak_cleaning.Rmd`
 
 Inputs the following 5 raw CSV files (out of the 10 from LifePak)
 ```
@@ -68,31 +68,31 @@ Also inputs `cleaned_qualtrics_ttt_phase_1.csv` (presumably originally from `01_
 
 Outputs `cleaned_combined_qualtrics_lifepak_ttt_phase_1.csv` (does not appear to be used later in data cleaning pipeline), `cleaned_lifepak_ttt_phase_1.csv`, and `cleaned_qualtrics_ttt_phase_1.csv`
 
-#### `03_deid_ttt_phase_1.Rmd`
+### `03_deid_ttt_phase_1.Rmd`
 
 Inputs cleaned LifePak data (`cleaned_lifepak_ttt_phase_1.csv`) and cleaned Qualtrics data (`cleaned_qualtrics_ttt_phase_1.csv`)
 
 Outputs deidentified data (`deid_cleaned_lifepak_ttt_phase_1.csv` and `deid_cleaned_qualtrics_ttt_phase_1.csv`)
 
-### Other Documentation
+## Other Documentation
 
 The following files in `/TRACK to TREAT/` appear relevant to data cleaning
 
-#### General
+### General
 
 - `/TRACK to TREAT/Data/readme_ttt_p1.docx`
 - `/TRACK to TREAT/Data/Processed Data/2022 From Michael Mullarkey/README.rtf`
 - `/TRACK to TREAT/Code/Data Cleaning/README_ttt_p1_data_cleaning.docx`
   - Points to [jwe4ec/track-to-treat](https://github.com/jwe4ec/track-to-treat) repo as most recent data cleaning effort
 
-#### LifePak
+### LifePak
 
 - `/TRACK to TREAT/Data/3TP1_LifePak_Version_IDs.xlsx`
 - `/TRACK to TREAT/Data/README info from Laura Jans` folder
   - See contents of this folder for info from Laura Jans re (a) 7 participants who have LifePak data for fewer than the expected number of beeps (see yellow highlights in `2024.04.03 Email with Laura Jans re EMA slider and missing EMA data.pdf`) and (b) whether EMA slider items could be skipped (see orange highlights).
   - For the main TTT paper, these data are treated as missing (see [jwe4ec/ttt-p1-main-analysis](https://github.com/jwe4ec/ttt-p1-main-analysis) repo)
 
-### Issues
+## Issues
 
 - Unable to reproduce clean Qualtrics data
   - As of 12/3/2024, Jeremy can reproduce clean Lifepak Data (`cleaned_lifepak_ttt_phase_1.csv` and `deid_cleaned_lifepak_ttt_phase_1.csv`) per `identical(x, y, FALSE, FALSE, FALSE, FALSE)`
