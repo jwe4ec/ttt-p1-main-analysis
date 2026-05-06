@@ -4,17 +4,19 @@ This repository contains code for the main paper for Phase 1 of Project Track to
 
 ## Centralized Data Cleaning
 
-The initial centralized data cleaning code was drafted by [Michael Mullarkey](https://github.com/mcmullarkey). Lab staff who contributed to Phase I of TTT include former research coordinators Sharon Leong (formerly Chen) and Akash Shroff, and Laura Jans (research assistant at the time).
+The initial centralized data cleaning code was drafted by [Michael Mullarkey](https://github.com/mcmullarkey).
+
+Lab staff who contributed to Phase I of TTT include former research coordinators Sharon Leong (formerly Chen) and Akash Shroff, and Laura Jans (research assistant at the time).
+
+The data and initial code are stored in `jslab/TRACK to TREAT/` on the FSMResFiles server.
 
 ### Data
 
-#### Raw
-
-##### From Qualtrics
+#### Raw Qualtrics
 
 Raw baseline and 3-month survey data are stored in `/TRACK to TREAT/Data/Qualtrics Data/Raw Data/`, which contains 18 CSV files obtained from Qualtrics (per Date Modified file metadata, presumably 6 files were obtained 6/16/2020-5/20/2021 and 12 files were obtained on 6/18/2021). The Qualtrics cleaning script appears to focus on the latter 12 files (see below).
 
-##### From LifePak
+#### Raw LifePak
 
 Raw EMA data are stored in `/TRACK to TREAT/Data/LifePak Raw Data (Do Not Modify)/`, which contains 10 CSV files obtained from LifePak (per Date Modified file metadata, presumably 8 files were obtained on 4/28/2020 and 2 files were obtained on 9/28/2021). The LifePak cleaning script appears to focus on the 5 files with `NIS` in the filename (see below); the `/TRACK to TREAT/Data/readme_ttt_p1.docx` file also states that files with `NIS` (which it defines as "notification-initiated survey") in the filename are the data to be used.
 
@@ -74,7 +76,7 @@ Outputs deidentified data (`deid_cleaned_lifepak_ttt_phase_1.csv` and `deid_clea
 
 ### Other Documentation
 
-The following files in `jslab/TRACK to TREAT/` appear relevant to data cleaning
+The following files in `/TRACK to TREAT/` appear relevant to data cleaning
 
 #### General
 
@@ -108,7 +110,7 @@ The following files in `jslab/TRACK to TREAT/` appear relevant to data cleaning
 ```
 - Some packages (`datapasta`, `fuzzyjoin`) are loaded partway through script rather than at top
 - One file (`dp5_p1_scoring.csv`) is loaded partway through `ttt_phase1_qualtrics_cleaning.Rmd` rather than at the top
-- Hard-coding (e.g., need to use LifePak filenames rather than code below in Lines 103-109 of `ttt_phase1_lifepak_cleaning.Rmd`)
+- Hard-coding (e.g., need to use LifePak filenames rather than code below in `ttt_phase1_lifepak_cleaning.Rmd`)
 ```
 files <- list.files(pattern = "*.csv")
 lifepak_files <- files[c(1:5)]
