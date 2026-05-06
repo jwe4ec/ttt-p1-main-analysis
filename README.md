@@ -12,11 +12,11 @@ The initial centralized data cleaning code was drafted by [Michael Mullarkey](ht
 
 ##### From Qualtrics
 
-Raw baseline and 3-month survey data are stored in the `/TRACK to TREAT/Data/Qualtrics Data/Raw Data` folder, which contains 18 CSV files obtained from Qualtrics (per Date Modified file metadata, presumably 6 files were obtained 6/16/20-5/20/21 and 12 files were obtained on 6/18/21). The Qualtrics cleaning script appears to focus on the latter 12 files (see below).
+Raw baseline and 3-month survey data are stored in the `/TRACK to TREAT/Data/Qualtrics Data/Raw Data` folder, which contains 18 CSV files obtained from Qualtrics (per Date Modified file metadata, presumably 6 files were obtained 6/16/2020-5/20/2021 and 12 files were obtained on 6/18/2021). The Qualtrics cleaning script appears to focus on the latter 12 files (see below).
 
 ##### From LifePak
 
-Raw EMA data are stored in the `/TRACK to TREAT/Data/LifePak Raw Data (Do Not Modify)` folder, which contains 10 CSV files obtained from LifePak (per Date Modified file metadata, presumably 8 files were obtained on 4/28/20 and 2 files were obtained on 9/28/21). The LifePak cleaning script appears to focus on the 5 files with `NIS` in the filename (see below); the `/TRACK to TREAT/Data/readme_ttt_p1.docx` file also states that files with `NIS` (which it defines as "notification-initiated survey") in the filename are the data to be used.
+Raw EMA data are stored in the `/TRACK to TREAT/Data/LifePak Raw Data (Do Not Modify)` folder, which contains 10 CSV files obtained from LifePak (per Date Modified file metadata, presumably 8 files were obtained on 4/28/2020 and 2 files were obtained on 9/28/2021). The LifePak cleaning script appears to focus on the 5 files with `NIS` in the filename (see below); the `/TRACK to TREAT/Data/readme_ttt_p1.docx` file also states that files with `NIS` (which it defines as "notification-initiated survey") in the filename are the data to be used.
 
 #### Clean
 
@@ -45,10 +45,10 @@ Inputs the following 12 raw CSV files (out of the 18 from Qualtrics)
 ```
 
 Also inputs `dp5_p1_scoring.csv`
-- This file, in `/TRACK to TREAT/Code/Data Cleaning/old/2022 From Michael Mullarkey`, was obtained by Jeremy Eberle from Michael on 10/31/23. Michael stated that he obtained the file from a Google Drive folder owned by Sharon Chen.
+- This file, in `/TRACK to TREAT/Code/Data Cleaning/old/2022 From Michael Mullarkey`, was obtained by Jeremy Eberle from Michael on 10/31/2023. Michael stated that he obtained the file from a Google Drive folder owned by Sharon Chen.
 
 Outputs (though both are commented out) `yb_lsmh_ids_dates.csv` and `cleaned_qualtrics_ttt_phase_1.csv`. Moreover, outputs `cleaned_qualtrics_ttt_phase_1_fixed_220604.csv`, but this does not appear to be used later in data cleaning pipeline (seems later scripts just input `cleaned_qualtrics_ttt_phase_1.csv`)
-- Isaac Ahuvia stated that he revised the cleaning script in May 2022 just to keep a variable that had been deleted or something similar, so `cleaned_qualtrics_ttt_phase_1_fixed_220604.csv` may relate to this. Both this script and a separate script `ttt_phase1_qualtrics_cleaning_fix.Rmd` (which is not on the present repo but in `/TRACK to TREAT/Code/Data Cleaning/old/2022.06 From Isaac Ahuvia` and which outputs a CSV file with a different date, `cleaned_qualtrics_ttt_phase_1_fixed_220606.csv`) were last modified on the same date (Date Modified metadata of 6/6/22).
+- Isaac Ahuvia stated that he revised the cleaning script in May 2022 just to keep a variable that had been deleted or something similar, so `cleaned_qualtrics_ttt_phase_1_fixed_220604.csv` may relate to this. Both this script and a separate script `ttt_phase1_qualtrics_cleaning_fix.Rmd` (which is not on the present repo but in `/TRACK to TREAT/Code/Data Cleaning/old/2022.06 From Isaac Ahuvia` and which outputs a CSV file with a different date, `cleaned_qualtrics_ttt_phase_1_fixed_220606.csv`) were last modified on the same date (Date Modified metadata of 6/6/2022).
 - Note: `02_ttt_phase1_lifepak_cleaning.Rmd` below inputs `cleaned_qualtrics_ttt_phase_1.csv` and then overwrites it after correcting some participant IDs
 
 #### `02_ttt_phase1_lifepak_cleaning.Rmd`
@@ -93,11 +93,11 @@ The following files in the `jslab/TRACK to TREAT` folder appear relevant to data
 ### Issues
 
 - Unable to reproduce clean Qualtrics data
-  - As of 12/3/24, Jeremy can reproduce clean Lifepak Data (`cleaned_lifepak_ttt_phase_1.csv` and `deid_cleaned_lifepak_ttt_phase_1.csv`) per `identical(x, y, FALSE, FALSE, FALSE, FALSE)`.
-    - Specifically, he can do so using R 4.1.1 (latest version available on 9/28/21; see below) and the most recent versions of `tidyverse`, `skimr`, `glue`, and `janitor` available on 12/3/24 (loaded via `library()`). He tried to use the `groundhog` package to load the latest available package versions on 1/7/22 (date that output files were saved to server; see below) but could not use `groundhog` to load `tidyverse` as `tidyverse` depends on `knitr`, which is "already in use" as it is used to execute Rmd files.
+  - As of 12/3/2024, Jeremy can reproduce clean Lifepak Data (`cleaned_lifepak_ttt_phase_1.csv` and `deid_cleaned_lifepak_ttt_phase_1.csv`) per `identical(x, y, FALSE, FALSE, FALSE, FALSE)`
+    - Specifically, he can do so using R 4.1.1 (latest version available on 9/28/2021; see below) and the most recent versions of `tidyverse`, `skimr`, `glue`, and `janitor` available on 12/3/2024 (loaded via `library()`). He tried to use the `groundhog` package to load the latest available package versions on 1/7/2022 (date that output files were saved to server; see below) but could not use `groundhog` to load `tidyverse` as `tidyverse` depends on `knitr`, which is "already in use" as it is used to execute Rmd files.
   - However, he cannot reproduce `cleaned_qualtrics_ttt_phase_1.csv`
   - It is unclear what R version and package versions should be used for each script
-    - `ttt_phase1_qualtrics_cleaning.Rmd` lists 6/17/2021 as the Date; `ttt_phase1_lifepak_cleaning.Rmd` lists 9/28/2021 as the Date. The output files `cleaned_qualtrics_ttt_phase_1.csv` and `cleaned_lifepak_ttt_phase_1.csv` have Date Modified metadata of 1/7/22. Thus, the scripts used R and package versions prior to these dates.
+    - `ttt_phase1_qualtrics_cleaning.Rmd` lists 6/17/2021 as the Date; `ttt_phase1_lifepak_cleaning.Rmd` lists 9/28/2021 as the Date. The output files `cleaned_qualtrics_ttt_phase_1.csv` and `cleaned_lifepak_ttt_phase_1.csv` have Date Modified metadata of 1/7/2022. Thus, the scripts used R and package versions prior to these dates.
     - Note: Michael stated that he cannot guarantee he always used the most up-to-date packages, but he endorsed using these dates as a starting point for determining which R and package versions he used
 - Unnecessary packages
   - Although many packages are loaded, only a few appear used by each script (see lists below)
