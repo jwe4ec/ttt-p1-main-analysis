@@ -2,16 +2,6 @@
 
 This repository contains code for the main paper for Phase 1 of Project Track to Treat. The repo is linked to this project on the Open Science Framework (OSF): [https://osf.io/c4e75/](https://osf.io/c4e75/).
 
-## Table of Contents
-
-- [Centralized Data Cleaning](#centralized-data-cleaning)
-  - [Data](#data)
-  - [Code](#code)
-  - [Other Documentation](#other-documentation)
-  - [TODOs](#todos)
-- [Network Analyses](#network-analyses)
-- [Machine Learning](#machine-learning)
-
 ## Centralized Data Cleaning
 
 The initial centralized data cleaning code was drafted by [Michael Mullarkey](https://github.com/mcmullarkey). Lab staff who contributed to Phase I of TTT include former research coordinators Sharon Leong (formerly Chen) and Akash Shroff, and Laura Jans (research assistant at the time).
